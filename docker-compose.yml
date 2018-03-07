@@ -1,0 +1,4 @@
+dp-search:
+  build: ./dp-search
+  ports:
+    - "5000:5000"
