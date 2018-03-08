@@ -1,2 +1,4 @@
 **/*.pyc
 **/**/*.pyc
+dp-search/cover/
+dp-search/.coverage

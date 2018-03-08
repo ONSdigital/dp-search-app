@@ -8,6 +8,6 @@ def create_app():
     app.config.from_object('config_' + config_name)
 
     from .search import search as search_blueprint
-    app.register_blueprint(search_blueprint)
+    app.register_blueprint(search_blueprint, url_prefix="/search")
 
     return app
