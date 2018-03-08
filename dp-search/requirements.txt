@@ -5,11 +5,14 @@ Jinja2==2.8
 MarkupSafe==0.23
 Werkzeug==0.11.
 
+# Elasticsearch
+elasticsearch=2.4.1
+
 # Elasticsearch 6.x
 # elasticsearch-dsl>=6.0.0,<7.0.0
 
 # Elasticsearch 5.x
-elasticsearch-dsl>=5.0.0,<6.0.0
+# elasticsearch-dsl>=5.0.0,<6.0.0
 
 # Elasticsearch 2.x
-# elasticsearch-dsl>=2.0.0,<3.0.0
+elasticsearch-dsl>=2.0.0,<3.0.0

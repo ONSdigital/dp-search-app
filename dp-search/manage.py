@@ -5,6 +5,7 @@ from flask.ext.script import Manager
 
 manager = Manager(create_app)
 
+
 @manager.command
 def test():
     from subprocess import call

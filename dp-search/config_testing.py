@@ -1,4 +1,4 @@
 import os
 
-DEBUG=False
-TESTING=True
+DEBUG = False
+TESTING = True
