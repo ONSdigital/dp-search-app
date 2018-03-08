@@ -1,7 +1,9 @@
 import os
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search as Search_api
-import queries
+from elasticsearch_dsl import aggs
+
+from legacy_queries import content_query, type_counts_query
 import fields
 
 search_url = os.environ.get('ELASTICSEARCH_URL', 'http://localhost:9200')
@@ -20,6 +22,14 @@ class SearchEngine(Search_api):
     def __init__(self, **kwargs):
         super(SearchEngine, self).__init__(**kwargs)
 
-    def content_query(self, search_term):
+    def legacy_content_query(self, search_term):
         sort = {fields.releaseDate.name: {"order": "desc"}}
-        return self.query(queries.content_query(search_term)).sort(sort)
+        return self.query(content_query(search_term)).sort(sort)
+
+    def type_counts(self, search_term):
+        qb = {
+            "query": content_query(search_term).to_dict(),
+            "aggs": type_counts_query()
+        }
+        self.update_from_dict(qb)
+        return self

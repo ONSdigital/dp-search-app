@@ -2,6 +2,7 @@ import pkg_resources
 pkg_resources.require("elasticsearch-dsl>=2.0.0,<3.0.0")
 
 from elasticsearch_dsl import query
+import copy
 
 
 def content_query(search_term):
@@ -125,3 +126,16 @@ def content_query(search_term):
         "function_score", query=dis_max, functions=functions)
 
     return function_score_query
+
+
+def type_counts_query():
+    type_count_query = {
+        "docCounts": {
+            "terms": {
+                "field": "_type",
+                "size": 0
+            }
+        }
+    }
+
+    return type_count_query
