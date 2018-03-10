@@ -26,7 +26,6 @@ def search():
     '''
     Simple search API to query Elasticsearch
     '''
-    print "Here"
 
     # Get query term from request
     search_term = request.args.get("q")
