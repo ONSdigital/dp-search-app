@@ -26,7 +26,7 @@ class SearchEngine(Search_api):
         sort = {fields.releaseDate.name: {"order": "desc"}}
         return self.query(content_query(search_term)).sort(sort)
 
-    def type_counts(self, search_term):
+    def type_counts_content_query(self, search_term):
         qb = {
             "query": content_query(search_term).to_dict(),
             "aggs": type_counts_query()
