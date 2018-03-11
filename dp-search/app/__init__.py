@@ -12,6 +12,6 @@ def create_app():
     CORS(app)
 
     from .search import search as search_blueprint
-    app.register_blueprint(search_blueprint)
+    app.register_blueprint(search_blueprint, url_prefix="/search")
 
     return app
