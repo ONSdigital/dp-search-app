@@ -1,9 +1,11 @@
 import os
 import logging
-from flask import Flask, request
-from flask import render_template
+from flask import Flask
+from flask import request
+from flask import jsonify
 from flask_cors import CORS
 from time import strftime
+
 
 def _create_app():
     from logging.handlers import RotatingFileHandler
@@ -14,12 +16,14 @@ def _create_app():
     app.config.from_object('config_' + config_name)
 
     # Enable Cross Origin Resource Sharing
-    CORS(app)
+    # CORS(app)
 
     # Setup logging
-    file_handler = RotatingFileHandler('dp-search-app.log', maxBytes=1024 * 1024 * 100, backupCount=3)
+    file_handler = RotatingFileHandler(
+        'dp-search-app.log', maxBytes=1024 * 1024 * 100, backupCount=3)
     file_handler.setLevel(logging.ERROR)
-    formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+    formatter = logging.Formatter(
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s")
     file_handler.setFormatter(formatter)
     app.logger.addHandler(file_handler)
 
@@ -32,7 +36,7 @@ def _create_app():
 # Create the app
 app = _create_app()
 
-# Log after every request
+
 @app.after_request
 def after_request(response):
     """ Logging after every request. """
@@ -41,18 +45,25 @@ def after_request(response):
     if response.status_code != 500:
         ts = strftime('[%Y-%b-%d %H:%M]')
         app.logger.info('%s %s %s %s %s %s',
-                      ts,
-                      request.remote_addr,
-                      request.method,
-                      request.scheme,
-                      request.full_path,
-                      response.status)
+                        ts,
+                        request.remote_addr,
+                        request.method,
+                        request.scheme,
+                        request.full_path,
+                        response.status)
     return response
 
-# Define a custom error handler that guarantees exceptions are always logged
+
 @app.errorhandler(Exception)
 def internal_server_error(exception):
+    """ Define a custom error handler that guarantees exceptions are always logged. """
     # Log the exception
+    from utils import is_number
     app.logger.error(exception)
-    # Return the error page
-    return exception, 500
+    # Jsonify the exception and return a error response
+    response = jsonify({"message" : str(exception)})
+    if (hasattr(exception, "status_code") and is_number(exception.status_code)):
+        response.status_code = int(exception.status_code)
+    else:
+        response.status_code = 500
+    return response
