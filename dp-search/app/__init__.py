@@ -3,7 +3,6 @@ import logging
 from flask import Flask
 from flask import request
 from flask import jsonify
-from flask_cors import CORS
 from time import strftime
 
 
@@ -15,9 +14,6 @@ def _create_app():
 
     app = Flask(__name__)
     app.config.from_object('config_' + config_name)
-
-    # Enable Cross Origin Resource Sharing
-    CORS(app)
 
     # Setup logging
     file_handler = RotatingFileHandler(
