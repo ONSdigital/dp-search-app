@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import os
-from app import app
+from server import app
 from gevent.wsgi import WSGIServer
 
 
