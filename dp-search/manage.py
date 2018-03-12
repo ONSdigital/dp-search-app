@@ -5,8 +5,6 @@ from gevent.wsgi import WSGIServer
 
 
 if __name__ == '__main__':
-    from gevent.pool import Pool
-
     # Start the server
     http_server = WSGIServer(('', 5000), app)
 
