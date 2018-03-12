@@ -1,8 +1,10 @@
 from flask import Blueprint
 from flask import jsonify
 
+# Create the search blueprint
 search = Blueprint("search", __name__)
 
+# Define some utility functions for search
 from .engine import get_search_engine
 import os
 
@@ -29,4 +31,5 @@ def hits_to_json(search_response):
 
     return jsonify(hits)
 
+# Import the routes (this should be done last here)
 from . import routes

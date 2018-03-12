@@ -8,6 +8,7 @@ from time import strftime
 
 
 def _create_app():
+    from search.engine import search_url
     from logging.handlers import RotatingFileHandler
     # Initialise the app
     config_name = os.environ.get('FLASK_CONFIG', 'development')
@@ -31,6 +32,10 @@ def _create_app():
     from .search import search as search_blueprint
     app.register_blueprint(search_blueprint, url_prefix="/search")
 
+    # Log some setup variables
+    app.logger.info("Running in %s mode" % config_name)
+    app.logger.info("Elasticsearch url: %s" % search_url)
+
     return app
 
 # Create the app
@@ -44,12 +49,13 @@ def after_request(response):
     # since that 500 is already logged via @app.errorhandler.
     if response.status_code != 500:
         ts = strftime('[%Y-%b-%d %H:%M]')
-        app.logger.info('%s %s %s %s %s %s',
+        app.logger.info('%s %s %s %s %s %s %s',
                         ts,
                         request.remote_addr,
                         request.method,
                         request.scheme,
                         request.full_path,
+                        request.cookies,
                         response.status)
     return response
 
