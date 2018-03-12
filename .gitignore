@@ -3,3 +3,6 @@
 dp-search/cover/
 dp-search/.coverage
 dp-search/dp-search-app.log
+vegeta/vegeta
+vegeta/results.bin
+vegeta/vegeta-v6.3.0-darwin-386.tar.gz
