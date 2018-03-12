@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 import os
-from app import create_app
+from app import app
 from gevent.wsgi import WSGIServer
 
 
 if __name__ == '__main__':
-    http_server = WSGIServer(('', 5000), create_app())
+    # Start the server
+    http_server = WSGIServer(('', 5000), app)
     http_server.serve_forever()
