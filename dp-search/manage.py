@@ -7,11 +7,10 @@ from gevent.wsgi import WSGIServer
 if __name__ == '__main__':
     from gevent.pool import Pool
 
-    pool_size = os.environ.get('POOL_SIZE', 8)
-    worker_pool = Pool(pool_size)
     # Start the server
-    http_server = WSGIServer(('', 5000), app, spawn=worker_pool)
+    http_server = WSGIServer(('', 5000), app)
 
+    # Start server and catch KeyboardInterrupt to allow for graceful shutdown.
     try:
         http_server.serve_forever()
     except KeyboardInterrupt: 
