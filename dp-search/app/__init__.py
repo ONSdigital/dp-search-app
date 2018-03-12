@@ -16,7 +16,7 @@ def _create_app():
     app.config.from_object('config_' + config_name)
 
     # Enable Cross Origin Resource Sharing
-    # CORS(app)
+    CORS(app)
 
     # Setup logging
     file_handler = RotatingFileHandler(
@@ -61,7 +61,7 @@ def internal_server_error(exception):
     from utils import is_number
     app.logger.error(exception)
     # Jsonify the exception and return a error response
-    response = jsonify({"message" : str(exception)})
+    response = jsonify({"message": str(exception)})
     if (hasattr(exception, "status_code") and is_number(exception.status_code)):
         response.status_code = int(exception.status_code)
     else:
