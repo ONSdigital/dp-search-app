@@ -1,5 +1,32 @@
 from flask import Blueprint
+from flask import jsonify
 
 search = Blueprint("search", __name__)
+
+from .engine import get_search_engine
+import os
+
+_INDEX = os.environ.get('SEARCH_INDEX', 'ons*')
+
+
+def ons_search_engine():
+    return get_search_engine(_INDEX)
+
+
+def aggs_to_json(aggs):
+    return aggs.__dict__["_d_"]
+
+
+def hits_to_json(search_response):
+    hits = {
+        "hits": [
+            h.to_dict() for h in search_response.hits
+        ]
+    }
+
+    if hasattr(search_response, "aggregations"):
+        hits["aggs"] = aggs_to_json(search_response.aggregations)
+
+    return jsonify(hits)
 
 from . import routes
