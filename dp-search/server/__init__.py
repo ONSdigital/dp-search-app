@@ -69,10 +69,17 @@ def after_request(response):
 def internal_server_error(exception):
     """ Define a custom error handler that guarantees exceptions are always logged. """
     # Log the exception
+    import sys, traceback
     from utils import is_number
-    app.logger.error(exception)
+
+    type_, value_, traceback_ = sys.exc_info()
+    app.logger.error(traceback.format_tb(traceback_) + "\n")
     # Jsonify the exception and return a error response
-    response = jsonify({"message": str(exception)})
+    response = jsonify({
+            "type": str(type_),
+            "value": str(value_),
+            "traceback": traceback.format_tb(traceback_)
+        })
     if hasattr(exception, "status_code") and is_number(exception.status_code):
         response.status_code = int(exception.status_code)
     else:

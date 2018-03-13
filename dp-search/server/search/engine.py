@@ -21,15 +21,23 @@ class SearchEngine(Search_api):
 
     def __init__(self, **kwargs):
         super(SearchEngine, self).__init__(**kwargs)
+        self.info = self._using.info()
 
-    def legacy_content_query(self, search_term):
+        # Grab a handle on the app logger
+        from flask import current_app as app
+        self.logger = app.logger
+
+        self.logger.info("Connected to Elasticsearch cluster '%s'" % self.info["name"])
+
+    def legacy_content_query(self, search_term, **kwargs):
         sort = {fields.releaseDate.name: {"order": "desc"}}
-        return self.query(content_query(search_term)).sort(sort)
+        query = content_query(search_term, **kwargs)
+        return self.query(query).sort(sort)
 
-    def type_counts_content_query(self, search_term):
-        qb = {
-            "query": content_query(search_term).to_dict(),
+    def type_counts_content_query(self, search_term, **kwargs):
+        query = {
+            "query": content_query(search_term, **kwargs),
             "aggs": type_counts_query()
         }
-        self.update_from_dict(qb)
+        self.update_from_dict(query)
         return self

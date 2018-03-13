@@ -1,5 +1,7 @@
 import gensim, enum
 
+DELIMITER = "_"
+
 _models = {}
 
 
