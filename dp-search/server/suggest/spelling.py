@@ -4,8 +4,7 @@ from gensim.models.keyedvectors import EuclideanKeyedVectors
 
 class SpellChecker(object):
     def __init__(self, word2vec):
-        if not isinstance(word2vec, EuclideanKeyedVectors):
-            raise ValueError("'model' must be an instance of EuclideanKeyedVectors")
+        assert isinstance(word2vec, EuclideanKeyedVectors)
 
         # Collect ranked list of words in vocab
         words = word2vec.index2word

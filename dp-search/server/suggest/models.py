@@ -16,6 +16,5 @@ def init(app):
 
 
 def load_model(model):
-    if not isinstance(model, Models):
-        raise ValueError("Must be instance of Models enum")
+    assert isinstance(model, Models)
     return _models[model]

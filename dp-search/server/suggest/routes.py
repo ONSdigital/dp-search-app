@@ -17,15 +17,16 @@ def similar(word):
 def similar_by_query():
     model = load_model(Models.ONS_FT)
 
+    print request.args.to_dict()
+
     query = request.args.get("q")
     if query is not None:
         terms = query.split()
 
-        negative = None
-        if "negative" in request.args:
-            negative = request.args.get("negative")
-            if negative is not None:
-                negative = negative.split()
+        negative = request.args.get("n")
+        if negative is not None:
+            negative = negative.split()
+        print negative
 
         count = int(request.args.get("count", 10))
 

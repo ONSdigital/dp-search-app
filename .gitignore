@@ -4,6 +4,7 @@
 build/
 dp-search/cover/
 dp-search/.coverage
+dp-search-app.log
 dp-search/dp-search-app.log
 vegeta/vegeta
 vegeta/results.bin
