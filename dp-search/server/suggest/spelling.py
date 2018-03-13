@@ -56,7 +56,7 @@ class SpellChecker(object):
 _models = {}
 
 
-def init(app):
+def init():
     for model in Models:
         _models[model] = SpellChecker(load_model(model))
 

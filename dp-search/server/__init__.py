@@ -32,13 +32,9 @@ def _create_app():
     app.logger.info("Running in %s mode" % config_name)
     app.logger.info("Elasticsearch url: %s" % search_url)
 
-    # Init suggest models
+    # Init suggest models using app config
     from suggest import models
     models.init(app)
-
-    # Init spelling models
-    from suggest import spelling
-    spelling.init(app)
 
     return app
 

@@ -55,8 +55,8 @@ def similar():
     count = int(request.args.get("count", "10"))
 
     # Add positive and negative terms, if supplied
-    positive = request.args.get("positive", "").split()
-    negative = request.args.get("negative", "").split()
+    positive = request.args.get("should", "").split()
+    negative = request.args.get("must_not", "").split()
 
     # Add the current search term as a positive hit
     positive.append(search_term)
