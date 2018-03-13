@@ -24,11 +24,21 @@ def _create_app():
 
     # Import blueprints
     from .search import search as search_blueprint
+    from .suggest import suggest as suggest_blueprint
     app.register_blueprint(search_blueprint, url_prefix="/search")
+    app.register_blueprint(suggest_blueprint, url_prefix="/suggest")
 
     # Log some setup variables
     app.logger.info("Running in %s mode" % config_name)
     app.logger.info("Elasticsearch url: %s" % search_url)
+
+    # Init suggest models
+    from suggest import models
+    models.init(app)
+
+    # Init spelling models
+    from suggest import spelling
+    spelling.init(app)
 
     return app
 
