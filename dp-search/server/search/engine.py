@@ -1,10 +1,10 @@
 import os
+
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search as Search_api
-from elasticsearch_dsl import aggs
 
-from legacy_queries import content_query, type_counts_query
 import fields
+from legacy_queries import content_query, type_counts_query
 
 search_url = os.environ.get('ELASTICSEARCH_URL', 'http://localhost:9200')
 

@@ -2,7 +2,6 @@
 # pkg_resources.require("elasticsearch-dsl>=2.0.0,<3.0.0")
 
 from elasticsearch_dsl import query
-import copy
 
 
 def content_query(search_term):

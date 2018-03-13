@@ -1,13 +1,12 @@
 from flask import request
-from . import search
-from . import ons_search_engine, hits_to_json
+from . import search, ons_search_engine, hits_to_json
 
 
 @search.route("/ons")
 def search():
-    '''
+    """
     Simple search API to query Elasticsearch
-    '''
+    """
 
     # Get query term from request
     search_term = request.args.get("q")

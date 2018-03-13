@@ -1,6 +1,3 @@
-from enum import Enum
-
-
 class Field(object):
 
     def __init__(self, name, boost=None, highlight=False):
@@ -17,6 +14,7 @@ class Field(object):
     @property
     def field_name_boosted(self):
         return "%s^%1.2f" % (self.name, self.boost) if self.boost is not None else self.name
+
 
 uri = Field("uri")
 # elastic search internal search score field in results

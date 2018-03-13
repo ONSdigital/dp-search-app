@@ -1,8 +1,6 @@
 import os
 import logging
-from flask import Flask
-from flask import request
-from flask import jsonify
+from flask import Flask, request, jsonify
 from time import strftime
 
 
@@ -34,6 +32,7 @@ def _create_app():
 
     return app
 
+
 # Create the app
 app = _create_app()
 
@@ -64,7 +63,7 @@ def internal_server_error(exception):
     app.logger.error(exception)
     # Jsonify the exception and return a error response
     response = jsonify({"message": str(exception)})
-    if (hasattr(exception, "status_code") and is_number(exception.status_code)):
+    if hasattr(exception, "status_code") and is_number(exception.status_code):
         response.status_code = int(exception.status_code)
     else:
         response.status_code = 500

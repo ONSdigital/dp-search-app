@@ -1,12 +1,11 @@
-from flask import Blueprint
-from flask import jsonify
+from flask import Blueprint, jsonify
+from .engine import get_search_engine
+import os
 
 # Create the search blueprint
 search = Blueprint("search", __name__)
 
 # Define some utility functions for search
-from .engine import get_search_engine
-import os
 
 _INDEX = os.environ.get('SEARCH_INDEX', 'ons*')
 
@@ -30,6 +29,7 @@ def hits_to_json(search_response):
         hits["aggs"] = aggs_to_json(search_response.aggregations)
 
     return jsonify(hits)
+
 
 # Import the routes (this should be done last here)
 from . import routes
