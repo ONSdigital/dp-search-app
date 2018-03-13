@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='dp-search-app',
-    version='',
+    version='0.1',
     packages=['dp-search.server', 'dp-search.server.search', 'dp-search.server.tracking'],
     url='',
     license='',

@@ -33,10 +33,16 @@ def main():
         http_server.stop()
 
 
+def usage(argv):
+    print "Usage: python %s <runserver|test>" % argv[0]
+
+
 if __name__ == '__main__':
     import sys
 
-    if len(sys.argv) > 1 and sys.argv[1] == "test":
+    if len(sys.argv) > 1 and sys.argv[1] == "runserver":
+        main()
+    elif len(sys.argv) > 1 and sys.argv[1] == "test":
         test()
     else:
-        main()
+        usage(sys.argv)
