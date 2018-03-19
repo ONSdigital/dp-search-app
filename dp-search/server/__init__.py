@@ -10,7 +10,7 @@ def _create_app():
     # Initialise the app
     config_name = os.environ.get('FLASK_CONFIG', 'development')
 
-    app = Flask(__name__)
+    app = Flask(__name__, template_folder="../web/templates", static_folder="../web/static")
     app.config.from_object('config_' + config_name)
 
     # Setup logging
@@ -24,9 +24,11 @@ def _create_app():
 
     # Import blueprints
     from .search import search as search_blueprint
-    from .suggest import suggest as suggest_blueprint
+    # from .suggest import suggest as suggest_blueprint
+    # from .nlp import nlp as nlp_blueprint
     app.register_blueprint(search_blueprint, url_prefix="/search")
-    app.register_blueprint(suggest_blueprint, url_prefix="/suggest")
+    # app.register_blueprint(suggest_blueprint, url_prefix="/suggest")
+    # app.register_blueprint(nlp_blueprint, url_prefix="/nlp")
 
     # Log some setup variables
     app.logger.info("Running in %s mode" % config_name)
@@ -69,7 +71,7 @@ def internal_server_error(exception):
     from utils import is_number
 
     type_, value_, traceback_ = sys.exc_info()
-    app.logger.error(traceback.format_tb(traceback_) + "\n")
+    app.logger.error(str(traceback.format_tb(traceback_)) + "\n")
     # Jsonify the exception and return a error response
     response = jsonify({
             "type": str(type_),

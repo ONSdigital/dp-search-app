@@ -1,4 +1,4 @@
-from flask import request
+from flask import request, render_template
 
 from . import search, ons_search_engine, hits_to_json
 from ..suggest.models import Models, load_model, DELIMITER
@@ -17,6 +17,11 @@ def execute_search(search_term, **kwargs):
 
     # Return the hits as JSON
     return hits_to_json(response)
+
+
+@search.route("/")
+def index():
+    return render_template("search.html")
 
 
 @search.route("/ons")

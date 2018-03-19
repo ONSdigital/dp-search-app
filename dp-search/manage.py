@@ -27,7 +27,7 @@ def main():
 
     # Start server and catch KeyboardInterrupt to allow for graceful shutdown.
     try:
-        app.logger.info("Starting server. Address is %s:%d" % (host, port))
+        app.logger.info("Listening on %s:%d" % (host, port))
         http_server.serve_forever()
     except KeyboardInterrupt:
         http_server.stop()
