@@ -1,11 +1,51 @@
-<link href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/css/bootstrap.css" rel="stylesheet"/>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+  <title>ONS</title>
+  <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+  <!-- Bootstrap -->
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 
-<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/js/bootstrap.js"></script>
-<script src="{{url_for('static', filename='js/typeahead.js/typeahead.jquery.js')}}"></script>
-<script src="{{url_for('static', filename='js/app.js')}}"></script>
+  <!-- typeahead -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.11.1/typeahead.bundle.min.js"></script>
+
+  <!-- APP -->
+  <script src="{{url_for('static', filename='js/app.js')}}"></script>
+  <link href="{{url_for('static', filename='css/search.css')}}" rel="stylesheet">
+</head>
+
+<body>
+  <nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#search-button">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="#">ONS</a>
+      </div>
+      <div class="collapse navbar-collapse" id="search">
+        <ul class="nav navbar-nav">
+          <li>
+            <input class="typeahead" type="text" placeholder="Search">
+          </li>
+          <li>
+            <a href="#">
+              <span class="glyphicon glyphicon-search"></span>
+            </a>
+          </li>
+        </ul>
 
 
-<div class="container" >
-  <input class="typeahead form-control" type="text" placeholder="States of USA" />
-</div>
+      </div>
+    </div>
+  </nav>
+
+</body>
+
+</html>

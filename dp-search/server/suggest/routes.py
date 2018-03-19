@@ -1,7 +1,8 @@
+from flask import jsonify, request
+
 from . import suggest
 from models import Models, load_model
 from spelling import load_spelling_model
-from flask import jsonify, request
 
 
 @suggest.route("/similar/<word>")
@@ -32,14 +33,17 @@ def similar_by_query():
     raise ValueError("Must supply query parameter for route /similar")
 
 
-@suggest.route("/spelling")
+@suggest.route("/autocomplete")
 def spelling():
     model = load_spelling_model(Models.ONS_FT)
 
     query = request.args.get("q")
     if query is not None:
         terms = query.split()
-
         result = model.correct_terms(terms)
-        return jsonify(result)
-    raise ValueError("Must supply query parameter for route /similar")
+
+        res = " ".join([result[key] for key in terms])
+
+        # TODO - Populate keywords
+        return jsonify({"value": res, "keywords": []})
+    raise ValueError("Must supply query parameter for route /autocomplete")
