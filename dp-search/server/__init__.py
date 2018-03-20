@@ -24,11 +24,11 @@ def _create_app():
 
     # Import blueprints
     from .search import search as search_blueprint
-    # from .suggest import suggest as suggest_blueprint
-    # from .nlp import nlp as nlp_blueprint
+    from .suggest import suggest as suggest_blueprint
+
+    # Register blueprints
     app.register_blueprint(search_blueprint, url_prefix="/search")
-    # app.register_blueprint(suggest_blueprint, url_prefix="/suggest")
-    # app.register_blueprint(nlp_blueprint, url_prefix="/nlp")
+    app.register_blueprint(suggest_blueprint, url_prefix="/suggest")
 
     # Log some setup variables
     app.logger.info("Running in %s mode" % config_name)

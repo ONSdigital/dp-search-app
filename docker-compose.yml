@@ -1,15 +1,19 @@
 version: '2'
 services:
-  ons_search:
-    build: ./dp-search
-    ports:
-      - "5000:5000"
-    depends_on:
-      - elasticsearch
-    environment: 
-      - ELASTICSEARCH_URL=elasticsearch:9200
+#  ons_search:
+#    build: ./dp-search
+#    ports:
+#      - "5000:5000"
+#    depends_on:
+#      - elasticsearch
+#    environment:
+#      - ELASTICSEARCH_URL=elasticsearch:9200
   elasticsearch:
     image: elasticsearch:2.4.2
     ports:
      - "9300:9300"
      - "9200:9200"
+  stanford-ner:
+    image: stanford:ner
+    ports:
+      - "9199:9199"

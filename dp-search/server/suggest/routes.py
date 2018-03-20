@@ -4,6 +4,10 @@ from . import suggest
 from models import Models, load_model
 from spelling import load_spelling_model
 
+# NER server
+from sner import Ner
+tagger = Ner(host='localhost', port=9199)
+
 
 @suggest.route("/similar/<word>")
 def similar(word):
@@ -42,8 +46,12 @@ def spelling():
         terms = query.split()
         result = model.correct_terms(terms)
 
-        res = " ".join([result[key] for key in terms])
+        tags = tagger.get_entities(" ".join([result[key] for key in terms]))
+
+        res = [ {"name": name, "tag": tag} for name,tag in tags ]
+
+        # res = " ".join([result[key] for key in terms])
 
         # TODO - Populate keywords
-        return jsonify({"value": res, "keywords": []})
+        return jsonify({"result": res, "keywords": []})
     raise ValueError("Must supply query parameter for route /autocomplete")

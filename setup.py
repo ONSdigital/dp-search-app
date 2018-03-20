@@ -8,5 +8,6 @@ setup(
     license='',
     author='sullid',
     author_email='',
-    description='', install_requires=['flask', 'elasticsearch', 'elasticsearch_dsl', 'gevent', 'gensim']
+    description='', install_requires=['flask', 'elasticsearch', 'elasticsearch_dsl', 'gevent', 'gensim', 'nltk', 'rake_nltk',
+                                      'sner']
 )
