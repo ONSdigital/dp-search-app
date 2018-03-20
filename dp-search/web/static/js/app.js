@@ -10,7 +10,8 @@ $(document).ready(function() {
             var result = resp.result
             var suggestions = []
 
-//            console.log(result)
+            console.log("Keywords:")
+            console.log(resp.keywords)
 
             result.forEach(function(val) {
                 suggestions.push(val.name)

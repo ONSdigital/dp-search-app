@@ -1,4 +1,4 @@
-from models import Models, load_model
+from word2vec_models import WordVectorModels, load_model
 from gensim.models.keyedvectors import EuclideanKeyedVectors
 
 
@@ -57,11 +57,11 @@ _models = {}
 
 
 def init():
-    for model in Models:
+    for model in WordVectorModels:
         _models[model] = SpellChecker(load_model(model))
 
 
 def load_spelling_model(model):
-    if not isinstance(model, Models):
+    if not isinstance(model, WordVectorModels):
         raise ValueError("Must be instance of Models enum")
     return _models[model]

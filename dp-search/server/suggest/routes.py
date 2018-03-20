@@ -1,7 +1,8 @@
 from flask import jsonify, request
 
 from . import suggest
-from models import Models, load_model
+from word2vec_models import WordVectorModels, load_model
+from supervised_models import SupervisedModels, load_supervised_model
 from spelling import load_spelling_model
 
 # NER server
@@ -12,7 +13,7 @@ tagger = Ner(host='localhost', port=9199)
 
 @suggest.route("/similar/<word>")
 def similar(word):
-    model = load_model(Models.ONS_FT)
+    model = load_model(WordVectorModels.ONS_FT)
 
     count = int(request.args.get("count", "10"))
     similar_words = model.wv.similar_by_word(word, count)
@@ -21,7 +22,7 @@ def similar(word):
 
 @suggest.route("/similar")
 def similar_by_query():
-    model = load_model(Models.ONS_FT)
+    model = load_model(WordVectorModels.ONS_FT)
 
     query = request.args.get("q")
     if query is not None:
@@ -40,18 +41,22 @@ def similar_by_query():
 
 @suggest.route("/autocomplete")
 def autocomplete():
-    model = load_spelling_model(Models.ONS_FT)
+    sc = load_spelling_model(WordVectorModels.ONS_FT)
+    supervised_model = load_supervised_model(SupervisedModels.ONS)
 
     query = request.args.get("q")
     if query is not None:
         terms = query.split()
-        result = model.correct_terms(terms)
+        result = sc.correct_terms(terms)
 
         tags = tagger.get_entities(" ".join([result[key] for key in terms]))
 
         res = [{"name": name, "tag": tag} for name, tag in tags]
 
-        # TODO - Populate keywords
+        # Get predicted keywords
+        top_n = int(request.args.get("count", "10"))
+        keywords = supervised_model.keywords(query, top_n=top_n)
+
         # TODO - Incorporate Elasticsearch suggest API
-        return jsonify({"result": res, "keywords": []})
+        return jsonify({"result": res, "keywords": keywords})
     raise ValueError("Must supply query parameter for route /autocomplete")

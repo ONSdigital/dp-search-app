@@ -1,7 +1,7 @@
 from flask import request, render_template
 
 from . import search, ons_search_engine, hits_to_json
-from ..suggest.models import Models, load_model, DELIMITER
+from ..suggest.word2vec_models import WordVectorModels, load_model, DELIMITER
 
 
 def execute_search(search_term, **kwargs):
@@ -54,7 +54,7 @@ def similar():
     search_term = request.args.get("q")
 
     # Load the model
-    model = load_model(Models.ONS_FT)
+    model = load_model(WordVectorModels.ONS_FT)
 
     # Determine how many similar terms to get
     count = int(request.args.get("count", "10"))

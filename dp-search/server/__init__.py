@@ -35,8 +35,9 @@ def _create_app():
     app.logger.info("Elasticsearch url: %s" % search_url)
 
     # Init suggest models using app config
-    from suggest import models
-    models.init(app)
+    from suggest import word2vec_models, supervised_models
+    word2vec_models.init(app)
+    supervised_models.init(app)
 
     return app
 
