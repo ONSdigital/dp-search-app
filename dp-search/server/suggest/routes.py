@@ -6,6 +6,7 @@ from spelling import load_spelling_model
 
 # NER server
 from sner import Ner
+
 tagger = Ner(host='localhost', port=9199)
 
 
@@ -38,7 +39,7 @@ def similar_by_query():
 
 
 @suggest.route("/autocomplete")
-def spelling():
+def autocomplete():
     model = load_spelling_model(Models.ONS_FT)
 
     query = request.args.get("q")
@@ -48,10 +49,9 @@ def spelling():
 
         tags = tagger.get_entities(" ".join([result[key] for key in terms]))
 
-        res = [ {"name": name, "tag": tag} for name,tag in tags ]
-
-        # res = " ".join([result[key] for key in terms])
+        res = [{"name": name, "tag": tag} for name, tag in tags]
 
         # TODO - Populate keywords
+        # TODO - Incorporate Elasticsearch suggest API
         return jsonify({"result": res, "keywords": []})
     raise ValueError("Must supply query parameter for route /autocomplete")

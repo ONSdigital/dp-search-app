@@ -41,13 +41,13 @@ $(document).ready(function() {
       source: suggest
     }).on('keyup', this, function(event) {
         if (event.keyCode == 13) {
-            update_results()
+            update_results();
         }
     });
 
     // Add onclick to search button
-    $('.glyphicon-search').click(function() {
-        update_results()
+    $('a.button-search').click(function() {
+        update_results();
     });
 
     // Add onclick refresh of page
