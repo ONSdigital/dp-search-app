@@ -20,7 +20,8 @@ $(document).ready(function() {
       }
     });
 
-    function update_results(query) {
+    function update_results() {
+        var query = $('input.typeahead.tt-input').val()
         $.ajax({
             url: "/search/ons?q=" + encodeURI(query),
             type: "GET",
@@ -40,15 +41,18 @@ $(document).ready(function() {
       source: suggest
     }).on('keyup', this, function(event) {
         if (event.keyCode == 13) {
-            var query = $('input.typeahead.tt-input').val()
-            update_results(query)
+            update_results()
         }
     });
 
     // Add onclick to search button
     $('.glyphicon-search').click(function() {
-        var val = $('input.typeahead.tt-input').val()
-        console.log(val)
+        update_results()
+    });
+
+    // Add onclick refresh of page
+    $('a.navbar-brand').click(function() {
+        location.reload();
     });
 });
 
