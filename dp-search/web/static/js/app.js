@@ -1,4 +1,8 @@
 $(document).ready(function() {
+    function getQueryString() {
+        return $('input.typeahead.tt-input').val();
+    }
+
     var suggest = new Bloodhound({
       datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
       queryTokenizer: Bloodhound.tokenizers.whitespace,
@@ -10,7 +14,7 @@ $(document).ready(function() {
             var result = resp.result
             var suggestions = []
 
-            console.log("Keywords:")
+            console.log("Keywords for query '" + getQueryString() + "':")
             console.log(resp.keywords)
 
             result.forEach(function(val) {
@@ -21,8 +25,8 @@ $(document).ready(function() {
       }
     });
 
-    function update_results() {
-        var query = $('input.typeahead.tt-input').val()
+    function updateResults() {
+        var query = getQueryString();
         $.ajax({
             url: "/search/ons?q=" + encodeURI(query),
             type: "GET",
@@ -42,13 +46,13 @@ $(document).ready(function() {
       source: suggest
     }).on('keyup', this, function(event) {
         if (event.keyCode == 13) {
-            update_results();
+            updateResults();
         }
     });
 
     // Add onclick to search button
     $('a.button-search').click(function() {
-        update_results();
+        updateResults();
     });
 
     // Add onclick refresh of page

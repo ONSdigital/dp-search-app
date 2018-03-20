@@ -22,7 +22,10 @@ class SupervisedModel(object):
         # Clean up labels
         labels = [label.replace(self.label, "") if self.label in label else label for label in labels]
 
-        result = [(label, P) for label, P in zip(labels, proba)]
+        result = [{"label": label, "P": P} for label, P in zip(labels, proba)]
+
+        # Sort by probability
+        result = sorted(result, key=lambda item: item["P"], reverse=True)
         return result
 
 

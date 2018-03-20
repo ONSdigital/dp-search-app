@@ -4,11 +4,9 @@ from . import suggest
 from word2vec_models import WordVectorModels, load_model
 from supervised_models import SupervisedModels, load_supervised_model
 from spelling import load_spelling_model
+from ner import get_stanford_ner_client
 
-# NER server
-from sner import Ner
-
-tagger = Ner(host='localhost', port=9199)
+tagger = get_stanford_ner_client()
 
 
 @suggest.route("/similar/<word>")

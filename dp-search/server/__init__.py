@@ -22,6 +22,8 @@ def _create_app():
     file_handler.setFormatter(formatter)
     app.logger.addHandler(file_handler)
 
+    app.logger.info("Initialising application from config '%s'" % config_name)
+
     # Import blueprints
     from .search import search as search_blueprint
     from .suggest import suggest as suggest_blueprint
@@ -31,7 +33,6 @@ def _create_app():
     app.register_blueprint(suggest_blueprint, url_prefix="/suggest")
 
     # Log some setup variables
-    app.logger.info("Running in %s mode" % config_name)
     app.logger.info("Elasticsearch url: %s" % search_url)
 
     # Init suggest models using app config
@@ -72,13 +73,14 @@ def internal_server_error(exception):
     from utils import is_number
 
     type_, value_, traceback_ = sys.exc_info()
-    app.logger.error(str(traceback.format_tb(traceback_)) + "\n")
-    # Jsonify the exception and return a error response
-    response = jsonify({
+    err = {
             "type": str(type_),
             "value": str(value_),
             "traceback": traceback.format_tb(traceback_)
-        })
+        }
+    app.logger.error(str(err) + "\n")
+    # Jsonify the exception and return a error response
+    response = jsonify(err)
     if hasattr(exception, "status_code") and is_number(exception.status_code):
         response.status_code = int(exception.status_code)
     else:
