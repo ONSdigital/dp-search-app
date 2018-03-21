@@ -4,26 +4,34 @@ $(document).ready(function() {
     }
 
     var suggest = new Bloodhound({
-      datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
-      queryTokenizer: Bloodhound.tokenizers.whitespace,
+      datumTokenizer: function(datum) {
+        return Bloodhound.tokenizers.whitespace(datum.value);
+      },
+      queryTokenizer: function(s) {
+        return Bloodhound.tokenizers.whitespace(s)
+      },
       rateLimitWait: 500,
       remote: {
         url: '/suggest/autocomplete?q=%QUERY',
         wildcard: '%QUERY',
-        filter: function(resp) {
-            var result = resp.result
+        filter: function(data) {
+            var result = data.suggestions
             var suggestions = []
 
-            console.log("Keywords for query '" + getQueryString() + "':")
-            console.log(resp.keywords)
+            console.log("Predicted keywords:");
+            console.log(data.keywords);
 
             result.forEach(function(val) {
-                suggestions.push(val.name)
+                suggestions.push(val.text);
             });
-            return [{"value": suggestions.join(" ")}]
+
+            return {value: suggestions.join(" ")};
         }
       }
     });
+
+    // Initialise the bloodhound engine
+    suggest.initialize();
 
     function updateResults() {
         var query = getQueryString();
@@ -40,10 +48,15 @@ $(document).ready(function() {
         });
     }
 
-    $('.typeahead').typeahead(null, {
+    $('.typeahead').typeahead({
+      hint: true,
+      highlight: true,
+      minLength: 1,
+      limit: 20
+    },
+    {
       name: 'suggest',
-      display: 'value',
-      source: suggest
+      source: suggest.ttAdapter()
     }).on('keyup', this, function(event) {
         if (event.keyCode == 13) {
             updateResults();

@@ -17,14 +17,18 @@ class SpellChecker(object):
     def correct_terms(self, terms):
         result = {}
         for term in terms:
-            result[term] = self.correction(term)
+            correction = self.correction(term)
+            result[term] = {
+                "text": correction,
+                "P": self.P(correction)
+            }
         return result
 
     def P(self, word):
         """ Probability of `word`. """
         # use inverse of rank as proxy
         # returns 0 if the word isn't in the dictionary
-        return - self.words.get(word, 0)
+        return - (float(self.words.get(word, 0)) / float(len(self.words)))
 
     def correction(self, word):
         """ Most probable spelling correction for word. """
@@ -65,3 +69,21 @@ def load_spelling_model(model):
     if not isinstance(model, WordVectorModels):
         raise ValueError("Must be instance of Models enum")
     return _models[model]
+
+
+def most_probable_corrections(models, terms):
+    """
+    Returns the most probable corrections for a series of models
+    :param models:
+    :param terms:
+    :return:
+    """
+    result = {}
+    for model in models:
+        sc = load_spelling_model(model)
+        r = sc.correct_terms(terms)
+        for key in r:
+            if key not in result or r[key]["P"] > result[key]["P"]:
+                result[key] = r[key]
+    return result
+

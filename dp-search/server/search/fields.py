@@ -39,3 +39,10 @@ latestRelease = Field("description.latestRelease")
 published = Field("description.published")
 cancelled = Field("description.cancelled")
 topics = Field("topics")
+
+field_list = [uri, _score, title_no_dates, title_first_letter, title_raw, title, \
+              title_no_stem, title_no_synonym_no_stem, edition, summary, releaseDate, \
+              metaDescription, keywords, _type, cdid, datasetId, searchBoost, latestRelease, \
+              published, cancelled, topics]
+
+suggestion_fields = [title_no_synonym_no_stem]

@@ -8,6 +8,7 @@ _models = {}
 
 class WordVectorModels(enum.Enum):
     ONS_FT = "ons_ft.vec"
+    GOOGLE_SLIM = "GoogleNews-vectors-negative300-SLIM.bin"
 
 
 def init(app):
