@@ -21,8 +21,23 @@ $(document).ready(function() {
             console.log("Predicted keywords:");
             console.log(data.keywords);
 
-            result.forEach(function(val) {
-                suggestions.push(val.text);
+            // Preserve order of tokens in query
+            var query = getQueryString()
+            var tokens = Bloodhound.tokenizers.whitespace(query)
+
+            tokens.forEach(function(token) {
+                if (token in result) {
+                    var options = result[token];
+                    if (("suggestions" in options) && ($.isArray(options["suggestions"]))
+                                && (options["suggestions"].length > 0)) {
+                        // Take top result only
+                        suggestions.push(options["suggestions"][0].suggestion);
+                    } else {
+                        suggestions.push(token);
+                    }
+                } else {
+                    suggestions.push(token);
+                }
             });
 
             return {value: suggestions.join(" ")};

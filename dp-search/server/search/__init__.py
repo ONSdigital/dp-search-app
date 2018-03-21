@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify
-from .engine import get_search_engine
+from .search_engine import get_search_engine
 import os
 
 # Create the search blueprint

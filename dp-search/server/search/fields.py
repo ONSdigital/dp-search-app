@@ -45,4 +45,4 @@ field_list = [uri, _score, title_no_dates, title_first_letter, title_raw, title,
               metaDescription, keywords, _type, cdid, datasetId, searchBoost, latestRelease, \
               published, cancelled, topics]
 
-suggestion_fields = [title_no_synonym_no_stem]
+suggestion_field = title_no_synonym_no_stem

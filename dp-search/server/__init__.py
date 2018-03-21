@@ -5,13 +5,17 @@ from time import strftime
 
 
 def _create_app():
-    from search.engine import search_url
+    from response import AutoJSONEncoder
+    from search.search_engine import search_url
     from logging.handlers import RotatingFileHandler
     # Initialise the app
     config_name = os.environ.get('FLASK_CONFIG', 'development')
 
     app = Flask(__name__, template_folder="../web/templates", static_folder="../web/static")
     app.config.from_object('config_' + config_name)
+
+    # Set custom JSONEncoder
+    app.json_encoder = AutoJSONEncoder
 
     # Setup logging
     file_handler = RotatingFileHandler(

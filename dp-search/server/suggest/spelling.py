@@ -1,6 +1,8 @@
 from word2vec_models import WordVectorModels, load_model
 from gensim.models.keyedvectors import EuclideanKeyedVectors
 
+from suggest_engine import Suggestion
+
 
 class SpellChecker(object):
     def __init__(self, word2vec):
@@ -18,17 +20,17 @@ class SpellChecker(object):
         result = {}
         for term in terms:
             correction = self.correction(term)
-            result[term] = {
-                "text": correction,
-                "P": self.P(correction)
-            }
+            P = self.P(correction)
+            if P > 0:
+                result[term] = {"correction": correction, "P": P}
         return result
 
     def P(self, word):
         """ Probability of `word`. """
-        # use inverse of rank as proxy
         # returns 0 if the word isn't in the dictionary
-        return - (float(self.words.get(word, 0)) / float(len(self.words)))
+        if word not in self.words:
+            return 0.
+        return float(len(self.words)) / (float(self.words.get(word, 0)) + float(len(self.words)))
 
     def correction(self, word):
         """ Most probable spelling correction for word. """
@@ -69,21 +71,4 @@ def load_spelling_model(model):
     if not isinstance(model, WordVectorModels):
         raise ValueError("Must be instance of Models enum")
     return _models[model]
-
-
-def most_probable_corrections(models, terms):
-    """
-    Returns the most probable corrections for a series of models
-    :param models:
-    :param terms:
-    :return:
-    """
-    result = {}
-    for model in models:
-        sc = load_spelling_model(model)
-        r = sc.correct_terms(terms)
-        for key in r:
-            if key not in result or r[key]["P"] > result[key]["P"]:
-                result[key] = r[key]
-    return result
 

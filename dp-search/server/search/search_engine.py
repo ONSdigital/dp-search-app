@@ -2,6 +2,7 @@ import os
 
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search as Search_api
+from elasticsearch_dsl import MultiSearch as MultiSearch_api
 
 import fields
 from legacy_queries import content_query, type_counts_query
@@ -22,12 +23,6 @@ class SearchEngine(Search_api):
     def __init__(self, **kwargs):
         super(SearchEngine, self).__init__(**kwargs)
         self.info = self._using.info()
-
-        # Grab a handle on the app logger
-        from flask import current_app as app
-        self.logger = app.logger
-
-        self.logger.info("Connected to Elasticsearch cluster '%s'" % self.info["name"])
 
     def legacy_content_query(self, search_term, **kwargs):
         sort = {fields.releaseDate.name: {"order": "desc"}}
