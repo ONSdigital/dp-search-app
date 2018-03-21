@@ -143,7 +143,7 @@ class SuggestEngine(object):
         for model in vector_models:
             sc = load_spelling_model(model)
             result = sc.correct_terms(tokens)
-            for key in tokens:
+            for key in result:
                 c = result[key]
                 suggestion = Suggestion(c["correction"], c["P"])
                 if key not in suggestions:
