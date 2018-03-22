@@ -19,17 +19,20 @@ def run_tests():
 
         os.environ['FLASK_CONFIG'] = 'testing'
         print check_output(['nosetests', '-v', '-s',
-              '--with-coverage', '--cover-package=server', '--cover-branches',
-              '--cover-erase', '--cover-html', '--cover-html-dir=cover'])
+                            '--with-coverage', '--cover-package=server', '--cover-branches',
+                            '--cover-erase', '--cover-html', '--cover-html-dir=cover'])
+
     # Run the test
     test()
 
 
 def main():
     from server import app
+    from flasgger import Swagger
 
     # Create the app
     app = app.create_app()
+    swagger = Swagger(app)
 
     # Need to patch sockets to make requests async
     monkey.patch_all()

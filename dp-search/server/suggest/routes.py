@@ -4,9 +4,15 @@ from . import suggest
 from supervised_models import load_supervised_model, SupervisedModels
 from suggest_engine import SuggestEngine
 
+from flasgger import swag_from
+
 
 @suggest.route("/autocomplete")
+@swag_from("swagger/autocomplete.yml")
 def autocomplete():
+    """
+    :return:
+    """
     query = str(request.args.get("q"))
     if query is not None:
         # Gather additional suggestions from word2vec models

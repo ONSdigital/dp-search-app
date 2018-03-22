@@ -2,6 +2,7 @@ import unittest
 
 from flask import current_app
 
+# Nosetests will take care of sys.path for this import
 from server.app import create_app
 app = create_app()
 
