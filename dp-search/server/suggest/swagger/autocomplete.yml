@@ -1,9 +1,11 @@
+description: Tokenizes the input query string on whitespace and returns a list of candidates for autocompletion/spelling correction. Also returns a list of potential ONS keywords which may apply to the input query, based on pre-trained machine learning models.
 parameters:
   - name: q
     in: query
     type: string
     required: true
     default: rpi
+    description: Query string to be evaluated.
 responses:
   200:
-    description: A list of all suggested substitute terms and keywords
+    description: All tokens in vocabulary
