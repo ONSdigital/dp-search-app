@@ -9,9 +9,11 @@ def create_app():
     from response import AutoJSONEncoder
     from search.search_engine import search_url
     from logging.handlers import RotatingFileHandler
-    # Initialise the app
+
+    # Get the config name
     config_name = os.environ.get('FLASK_CONFIG', 'development')
 
+    # Initialise the app from the config
     app = Flask(__name__, template_folder="../web/templates", static_folder="../web/static")
     app.config.from_object('config_' + config_name)
 

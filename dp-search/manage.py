@@ -15,10 +15,10 @@ def run_tests():
     # Register the test function
     @manager.command
     def test():
-        from subprocess import call
+        from subprocess import check_output
 
         os.environ['FLASK_CONFIG'] = 'testing'
-        call(['nosetests', '-v',
+        print check_output(['nosetests', '-v', '-s',
               '--with-coverage', '--cover-package=server', '--cover-branches',
               '--cover-erase', '--cover-html', '--cover-html-dir=cover'])
     # Run the test

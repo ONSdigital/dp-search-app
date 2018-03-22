@@ -3,6 +3,7 @@ from flask import request, jsonify
 from . import nlp
 from ner import get_stanford_ner_client
 
+
 @nlp.route("/ner")
 def ner():
     query = request.args.get("q")
