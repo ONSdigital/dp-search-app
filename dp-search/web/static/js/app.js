@@ -18,9 +18,6 @@ $(document).ready(function() {
             var result = data.suggestions
             var suggestions = []
 
-            console.log("Predicted keywords:");
-            console.log(data.keywords);
-
             // Preserve order of tokens in query
             var query = getQueryString()
             var tokens = Bloodhound.tokenizers.whitespace(query)

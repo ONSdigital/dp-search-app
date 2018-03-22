@@ -1,4 +1,4 @@
-description: Tokenizes the input query string on whitespace and returns a list of candidates for autocompletion/spelling correction.
+description: Returns a list of potential ONS keywords which may apply to the input query, based on pre-trained machine learning models.
 parameters:
   - name: q
     in: query

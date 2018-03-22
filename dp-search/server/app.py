@@ -82,7 +82,8 @@ def create_app():
             "value": str(value_),
             "traceback": traceback.format_tb(traceback_)
         }
-        app.logger.error(str(err) + "\n")
+        if app.config["TESTING"] is False:
+            app.logger.error(str(err) + "\n")
         # Jsonify the exception and return a error response
         response = jsonify(err)
         if hasattr(exception, "status_code") and is_number(exception.status_code):

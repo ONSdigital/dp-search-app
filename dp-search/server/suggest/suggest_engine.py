@@ -78,7 +78,6 @@ class SuggestEngine(object):
         :param text:
         :return:
         """
-        assert isinstance(text, str), "Text must be a string"
         from ..search import ons_search_engine, fields
 
         tokens = text.split()
@@ -116,7 +115,6 @@ class SuggestEngine(object):
         :param vector_models:
         :return:
         """
-        assert isinstance(text, str), "Text must be a string"
         from spell_checker import load_spelling_model
 
         tokens = text.split()
