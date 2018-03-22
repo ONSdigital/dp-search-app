@@ -2,12 +2,12 @@ import unittest
 
 from flask import current_app
 
-from server import app
+from server.app import create_app
 
 
 class BasicsTestCase(unittest.TestCase):
     def setUp(self):
-        self.app = app
+        self.app = create_app()
         self.app_context = self.app.app_context()
         self.app_context.push()
         self.client = self.app.test_client()

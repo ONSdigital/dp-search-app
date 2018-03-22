@@ -1,6 +1,6 @@
 import collections
+
 from word2vec_models import WordVectorModels
-from supervised_models import SupervisedModels
 
 
 class Suggestion(object):
@@ -72,27 +72,9 @@ class Suggestions(object):
 
 class SuggestEngine(object):
     @staticmethod
-    def keywords(text, top_n=5, models=SupervisedModels):
-        """
-        Returns predicted keywords for the given raw text
-        :param text:
-        :param models:
-        :return:
-        """
-        assert isinstance(text, str), "Text must be a string"
-        from supervised_models import load_supervised_model
-
-        keywords = []
-        for model in models:
-            sm = load_supervised_model(model)
-            result = sm.keywords(text, top_n=top_n)
-            keywords.extend(result)
-        return keywords
-
-    @staticmethod
     def elastic_search_suggest(text):
         """
-        Method to get suggestions from Elasticsearch
+        Method to get phrase suggestions from Elasticsearch.
         :param text:
         :return:
         """
@@ -127,7 +109,7 @@ class SuggestEngine(object):
         return _sort_dict_by_tokens(suggestions, tokens)
 
     @staticmethod
-    def most_probable_corrections(text, vector_models=WordVectorModels):
+    def word2vec_suggest(text, vector_models=WordVectorModels):
         """
         Returns the most probable corrections for a series of models.
         :param text:
@@ -135,7 +117,7 @@ class SuggestEngine(object):
         :return:
         """
         assert isinstance(text, str), "Text must be a string"
-        from spelling import load_spelling_model
+        from spell_checker import load_spelling_model
 
         tokens = text.split()
 

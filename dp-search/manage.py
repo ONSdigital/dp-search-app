@@ -1,20 +1,35 @@
 #!/usr/bin/env python
 import os
-from gevent.wsgi import WSGIServer
+
 from gevent import monkey
+from gevent.wsgi import WSGIServer
 
 
-def test():
-    from subprocess import call
+def run_tests():
+    from flask_script import Manager
+    from server.app import create_app
 
-    os.environ['FLASK_CONFIG'] = 'testing'
-    call(['nosetests', '-v',
-          '--with-coverage', '--cover-package=server', '--cover-branches',
-          '--cover-erase', '--cover-html', '--cover-html-dir=cover'])
+    # Initialise a manager to test our app
+    manager = Manager(create_app)
+
+    # Register the test function
+    @manager.command
+    def test():
+        from subprocess import call
+
+        os.environ['FLASK_CONFIG'] = 'testing'
+        call(['nosetests', '-v',
+              '--with-coverage', '--cover-package=server', '--cover-branches',
+              '--cover-erase', '--cover-html', '--cover-html-dir=cover'])
+    # Run the test
+    test()
 
 
 def main():
     from server import app
+
+    # Create the app
+    app = app.create_app()
 
     # Need to patch sockets to make requests async
     monkey.patch_all()
@@ -43,6 +58,6 @@ if __name__ == '__main__':
     if len(sys.argv) > 1 and sys.argv[1] == "runserver":
         main()
     elif len(sys.argv) > 1 and sys.argv[1] == "test":
-        test()
+        run_tests()
     else:
         usage(sys.argv)

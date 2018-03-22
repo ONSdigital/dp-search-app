@@ -2,7 +2,6 @@ import os
 
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search as Search_api
-from elasticsearch_dsl import MultiSearch as MultiSearch_api
 
 import fields
 from legacy_queries import content_query, type_counts_query

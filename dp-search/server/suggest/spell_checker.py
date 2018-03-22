@@ -1,7 +1,4 @@
-from word2vec_models import WordVectorModels, load_model
 from gensim.models.keyedvectors import EuclideanKeyedVectors
-
-from suggest_engine import Suggestion
 
 
 class SpellChecker(object):
@@ -63,11 +60,15 @@ _models = {}
 
 
 def init():
+    from word2vec_models import WordVectorModels, load_model
+
     for model in WordVectorModels:
         _models[model] = SpellChecker(load_model(model))
 
 
 def load_spelling_model(model):
+    from word2vec_models import WordVectorModels
+    
     if not isinstance(model, WordVectorModels):
         raise ValueError("Must be instance of Models enum")
     return _models[model]

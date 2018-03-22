@@ -1,6 +1,7 @@
 from flask import request, jsonify
 
 from . import suggest
+from supervised_models import load_supervised_model, SupervisedModels
 from suggest_engine import SuggestEngine
 
 
@@ -9,11 +10,12 @@ def autocomplete():
     query = str(request.args.get("q"))
     if query is not None:
         # Gather additional suggestions from word2vec models
-        suggestions = SuggestEngine.most_probable_corrections(query)
+        suggestions = SuggestEngine.word2vec_suggest(query)
 
         # Get predicted keywords
         top_n = int(request.args.get("count", "5"))
-        keywords = SuggestEngine.keywords(query, top_n=top_n)
+        supervised_model = load_supervised_model(SupervisedModels.ONS)
+        keywords = supervised_model.keywords(query, top_n=top_n)
 
         response = {"suggestions": suggestions, "keywords": keywords}
         return jsonify(response)
