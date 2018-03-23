@@ -1,20 +1,13 @@
-import unittest
-
 import urllib
 
 from flask import json
 
-# Nosetests will take care of sys.path for this import
-from server.app import create_app
-app = create_app()
+from base import BaseTest
 
 
-class SuggestTestCase(unittest.TestCase):
+class SuggestTestCase(BaseTest):
     def setUp(self):
-        self.app = app
-        self.app_context = self.app.app_context()
-        self.app_context.push()
-        self.client = self.app.test_client()
+        super(SuggestTestCase, self).setUp()
 
         self.query = "rpj chi"
         self.tokens = self.query.split()
@@ -37,17 +30,17 @@ class SuggestTestCase(unittest.TestCase):
         self.assertFalse(response is None)
         self.assertEquals(response.status_code, 200)
 
-    def test_autocomplete_internal_server_error(self):
+    def test_autocomplete_bad_request(self):
         request = "/suggest/autocomplete"
         response = self.client.get(request)
 
-        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.status_code, 400)
 
-    def test_keywords_internal_server_error(self):
+    def test_keywords_bad_request(self):
         request = "/suggest/keywords"
         response = self.client.get(request)
 
-        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.status_code, 400)
 
     def test_autocomplete_data_contains_keys(self):
         request = "/suggest/autocomplete?q=" + urllib.quote_plus(self.query)

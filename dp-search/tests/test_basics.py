@@ -1,18 +1,11 @@
-import unittest
-
 from flask import current_app
 
-# Nosetests will take care of sys.path for this import
-from server.app import create_app
-app = create_app()
+from base import BaseTest
 
 
-class BasicsTestCase(unittest.TestCase):
+class BasicsTestCase(BaseTest):
     def setUp(self):
-        self.app = app
-        self.app_context = self.app.app_context()
-        self.app_context.push()
-        self.client = self.app.test_client()
+        super(BasicsTestCase, self).setUp()
 
     def tearDown(self):
         self.app_context.pop()
