@@ -1,5 +1,7 @@
 from flask import request, jsonify
 
+from ..app import get_request_param
+
 from . import suggest
 from supervised_models import load_supervised_model, SupervisedModels
 from suggest_engine import SuggestEngine
@@ -13,17 +15,15 @@ def keywords():
     """
     :return:
     """
-    if "q" in request.args:
-        query = request.args.get("q")
-        if query is not None:
-            # Get predicted keywords
-            top_n = int(request.args.get("count", "5"))
-            supervised_model = load_supervised_model(SupervisedModels.ONS)
-            keywords = supervised_model.keywords(query, top_n=top_n)
+    query = get_request_param("q")
 
-            response = {"keywords": keywords}
-            return jsonify(response)
-    raise ValueError("Must supply query parameter for route /keywords")
+    # Get predicted keywords
+    top_n = int(request.args.get("count", "5"))
+    supervised_model = load_supervised_model(SupervisedModels.ONS)
+    keywords = supervised_model.keywords(query, top_n=top_n)
+
+    response = {"keywords": keywords}
+    return jsonify(response)
 
 
 @suggest.route("/autocomplete")
@@ -32,13 +32,10 @@ def autocomplete():
     """
     :return:
     """
-    if "q" in request.args:
-        query = request.args.get("q")
-        if query is not None:
-            # Gather additional suggestions from word2vec models
-            suggestions = SuggestEngine.word2vec_suggest(query)
+    query = get_request_param("q")
 
-            response = {"suggestions": suggestions}
-            return jsonify(response)
+    # Gather additional suggestions from word2vec models
+    suggestions = SuggestEngine.word2vec_suggest(query)
 
-    raise ValueError("Must supply query parameter for route /autocomplete")
+    response = {"suggestions": suggestions}
+    return jsonify(response)

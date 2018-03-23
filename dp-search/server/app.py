@@ -1,8 +1,23 @@
 import os
 import logging
 from flask import Flask
-from flask import request, jsonify
+from flask import request, redirect, jsonify
 from time import strftime
+
+
+def get_request_param(key):
+    """
+    Simple util function for extracting parameters from requests.
+    :param key:
+    :return: value
+    :raises ValueError: key not found or value is None
+    """
+    if key in request.args:
+        value = request.args.get(key)
+        if value is not None:
+            return value
+    message = "Unable to find arg with key '%s' for route '%s'" % (key, request.url)
+    raise ValueError(message)
 
 
 def create_app():
@@ -48,6 +63,11 @@ def create_app():
     from suggest import word2vec_models, supervised_models
     word2vec_models.init(app)
     supervised_models.init(app)
+
+    # Redirect from index to apidocs
+    @app.route("/")
+    def index():
+        return redirect("/apidocs")
 
     # Declare function to log each request
     @app.after_request

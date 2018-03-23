@@ -22,6 +22,16 @@ $(document).ready(function() {
             var query = getQueryString()
             var tokens = Bloodhound.tokenizers.whitespace(query)
 
+            // Log keywords with separate AJAX call
+            $.ajax({
+                url: "/suggest/keywords?q=" + encodeURI(query),
+                type: "GET",
+                success: function(data) {
+                    console.log("Keywords:")
+                    console.log(data)
+                }
+            });
+
             tokens.forEach(function(token) {
                 if (token in result) {
                     var options = result[token];

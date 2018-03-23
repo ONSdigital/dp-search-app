@@ -1,5 +1,7 @@
 from flask import request, render_template
 
+from ..app import get_request_param
+
 from . import search, ons_search_engine, hits_to_json
 from ..suggest.word2vec_models import WordVectorModels, load_model, DELIMITER
 
@@ -30,7 +32,7 @@ def content_query():
     API for executing a standard ONS query
     """
     # Get query term from request
-    search_term = request.args.get("q")
+    search_term = get_request_param("q")
 
     # Build any must/should/must_not clauses
     kwargs = {
@@ -51,7 +53,7 @@ def similar():
     """
 
     # Get query term from request
-    search_term = request.args.get("q")
+    search_term = get_request_param("q")
 
     # Load the model
     model = load_model(WordVectorModels.ONS_FT)
