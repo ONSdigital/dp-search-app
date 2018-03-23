@@ -27,7 +27,7 @@ def index():
 
 
 @swag_from("swagger/content_query.yml")
-@search.route("/ons")
+@search.route("/ons", methods=["POST"])
 def content_query():
     """
     API for executing a standard ONS query
@@ -37,9 +37,9 @@ def content_query():
 
     # Build any must/should/must_not clauses
     kwargs = {
-        "must": request.args.get("must", "").split(),
-        "should": request.args.get("should", "").split(),
-        "must_not": request.args.get("must_not", "").split()
+        "must": request.form.get("must", "").split(),
+        "should": request.form.get("should", "").split(),
+        "must_not": request.form.get("must_not", "").split()
     }
 
     # Execute the search

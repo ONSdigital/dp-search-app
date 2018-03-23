@@ -9,17 +9,17 @@ parameters:
     default: rpi
     description: Query to execute against Elasticsearch.
   - name: must
-    in: query
+    in: formData
     type: string
     required: false
     description: Specify terms which documents MUST match.
   - name: should
-    in: query
+    in: formData
     type: string
     required: false
     description: Specify terms which documents SHOULD match.
   - name: must_not
-    in: query
+    in: formData
     type: string
     required: false
     description: Specify terms which documents MUST NOT match.
