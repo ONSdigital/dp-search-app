@@ -32,7 +32,7 @@ def content_query():
     API for executing a standard ONS query
     """
     # Get query term from request
-    search_term = get_request_param("q")
+    search_term = get_request_param("q", True)
 
     # Build any must/should/must_not clauses
     kwargs = {
@@ -53,7 +53,7 @@ def similar():
     """
 
     # Get query term from request
-    search_term = get_request_param("q")
+    search_term = get_request_param("q", True)
 
     # Load the model
     model = load_model(WordVectorModels.ONS_FT)

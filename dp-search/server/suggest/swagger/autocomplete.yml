@@ -1,3 +1,5 @@
+tags:
+  - suggest
 description: Tokenizes the input query string on whitespace and returns a list of candidates for autocompletion/spelling correction.
 parameters:
   - name: q
@@ -9,5 +11,5 @@ parameters:
 responses:
   200:
     description: All tokens in vocabulary
-  500:
+  400:
     description: If q is not specified or None

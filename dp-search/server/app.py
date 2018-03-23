@@ -1,23 +1,32 @@
-import os
 import logging
-from flask import Flask
-from flask import request, redirect, jsonify
+import os
 from time import strftime
 
+from flask import Flask
+from flask import request, redirect, jsonify
 
-def get_request_param(key):
+from exceptions.requests import BadRequest
+
+
+def get_request_param(key, required, default=None):
     """
     Simple util function for extracting parameters from requests.
     :param key:
+    :param required:
+    :param default:
     :return: value
     :raises ValueError: key not found or value is None
     """
     if key in request.args:
         value = request.args.get(key)
-        if value is not None:
+        if value is not None and len(value) > 0:
             return value
-    message = "Unable to find arg with key '%s' for route '%s'" % (key, request.url)
-    raise ValueError(message)
+    if required:
+        message = "Invalid value for required argument '%s' and route '%s'" % (key, request.url)
+        # Will be automatically caught by handle_exception and return a 400
+        raise BadRequest(message)
+    else:
+        return default
 
 
 def create_app():
@@ -89,7 +98,7 @@ def create_app():
 
     # Declare function to log all uncaught exceptions and return a 500 with info
     @app.errorhandler(Exception)
-    def internal_server_error(exception):
+    def handle_exception(exception):
         """ Define a custom error handler that guarantees exceptions are always logged. """
         # Log the exception
         import sys
