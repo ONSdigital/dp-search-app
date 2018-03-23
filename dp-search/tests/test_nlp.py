@@ -33,6 +33,10 @@ class NLPTestCase(BaseTest):
         response = self.client.get(request)
 
         data = response.data
+
+        self.assertFalse(data is None)
+        self.assertTrue(isinstance(data, str))
+
         json_data = json.loads(data)
         self.assertFalse(json_data is None)
         self.assertTrue(isinstance(json_data, list))

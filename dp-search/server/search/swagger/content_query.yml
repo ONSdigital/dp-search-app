@@ -1,0 +1,30 @@
+tags:
+  - search
+description: Executes the standard ONS content query. Also returns aggregared document counts.
+parameters:
+  - name: q
+    in: query
+    type: string
+    required: true
+    default: rpi
+    description: Query to execute against Elasticsearch.
+  - name: must
+    in: query
+    type: string
+    required: false
+    description: Specify terms which documents MUST match.
+  - name: should
+    in: query
+    type: string
+    required: false
+    description: Specify terms which documents SHOULD match.
+  - name: must_not
+    in: query
+    type: string
+    required: false
+    description: Specify terms which documents MUST NOT match.
+responses:
+  200:
+    description: Elasticsearch query executed successfully.
+  400:
+    description: If q is not specified or None.
