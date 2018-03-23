@@ -1,0 +1,3 @@
+[submodule "dp-search/lib/fastText"]
+	path = dp-search/lib/fastText
+	url = git@github.com:facebookresearch/fastText.git
