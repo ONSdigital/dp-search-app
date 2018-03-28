@@ -1,9 +1,11 @@
 FROM java:8
 
-COPY . /stanford_nlp
-WORKDIR /stanford_nlp/stanford-ner-2018-02-27
+WORKDIR /home
+RUN wget -O ner.zip http://nlp.stanford.edu/software/stanford-ner-2015-04-20.zip
+RUN unzip ner.zip
+
 EXPOSE 9199
 
-# RUN wget http://nlp.stanford.edu/software/stanford-corenlp-full-2018-01-31.zip
+WORKDIR /home/stanford-ner-2015-04-20
 
-CMD ["java", "-Djava.ext.dirs=./lib", "-cp", "stanford-ner.jar", "edu.stanford.nlp.ie.NERServer", "-port", "9199", "-loadClassifier", "../edu/stanford/nlp/models/ner/english.muc.7class.caseless.distsim.crf.ser.gz"]
+CMD ["java", "-Djava.ext.dirs=./lib", "-cp", "stanford-ner.jar", "edu.stanford.nlp.ie.NERServer", "-port", "9199", "-loadClassifier", "classifiers/english.muc.7class.distsim.crf.ser.gz"]

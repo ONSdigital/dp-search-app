@@ -81,6 +81,8 @@ def create_app():
     # Declare function to log each request
     @app.after_request
     def after_request(response):
+        from users.user import create_user, user_exists
+
         """ Logging after every request. """
         # This avoids the duplication of registry in the log,
         # since that 500 is already logged via @app.errorhandler.
@@ -94,6 +96,18 @@ def create_app():
                             request.full_path,
                             request.cookies,
                             response.status)
+
+        # Track the user
+        if "_ga" in request.cookies:
+            user_id = request.cookies.get("_ga")
+            if not user_exists(user_id):
+                app.logger.info("Creating user: %s" % user_id)
+                user = create_user(user_id)
+                try:
+                    user.save()
+                    app.logger.info("User '%s' saved" % user_id)
+                except Exception as e:
+                    app.logger.error("Unable to create user '%s'" % user_id, e)
         return response
 
     # Declare function to log all uncaught exceptions and return a 500 with info

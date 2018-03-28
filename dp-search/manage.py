@@ -29,9 +29,13 @@ def run_tests():
 def main():
     from server import app
     from flasgger import Swagger
+    from flask_mongoengine import MongoEngine
 
     # Create the app
     app = app.create_app()
+    # Init mongoDB connection
+    app.db = MongoEngine(app)
+    # Init swagger API docs
     swagger = Swagger(app)
 
     # Need to patch sockets to make requests async

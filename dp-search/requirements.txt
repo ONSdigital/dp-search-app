@@ -9,6 +9,8 @@ gevent==1.2.2
 # rake_nltk==1.0.2
 flasgger==0.8.1
 gensim==3.2.0
+numpy==1.14.0
+flask-mongoengine
 sner
 enum34
 logging
