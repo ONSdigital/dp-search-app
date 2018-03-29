@@ -36,13 +36,14 @@ def get_current_user_id():
 
 def get_current_user():
     user_id = get_current_user_id()
-    if user_id and user_exists(user_id):
-        return find_user(user_id)
-    else:
-        # Create a user
-        user = create_user(user_id)
-        user.save()
-        return user
+    if user_id:
+        if user_exists(user_id):
+            return find_user(user_id)
+        else:
+            # Create a user
+            user = create_user(user_id)
+            user.save()
+            return user
     return None
 
 
