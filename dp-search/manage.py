@@ -52,6 +52,11 @@ def main():
         app.logger.info("Listening on %s:%d" % (host, port))
         http_server.serve_forever()
     except KeyboardInterrupt:
+        # Close mongoDB connection
+        with app.app_context():
+            app.logger.info("Closing mongoDB connection")
+            app.db.connection.close()
+            app.logger.info("Done")
         http_server.stop()
 
 

@@ -15,24 +15,33 @@ class SupervisedModel(object):
         assert isinstance(model, SupervisedModels)
         assert isinstance(supervised_model, fastText.FastText._FastText)
         self.model = model
-        self.supervised_model = supervised_model
+        self.f = supervised_model
         self.prefix = prefix
 
         # Normalised vectors
-        self.input_matrix_normalised = self._normalise_matrix(self.supervised_model.get_input_matrix())
-        self.output_matrix_normalised = self._normalise_matrix(self.supervised_model.get_output_matrix())
+        self.input_matrix_normalised = self._normalise_matrix(self.f.get_input_matrix())
+        self.output_matrix_normalised = self._normalise_matrix(self.f.get_output_matrix())
 
         # Labels
-        self.labels = np.array(self.supervised_model.get_labels())
+        self.labels = np.array(self.f.get_labels())
 
     @staticmethod
     def _normalise_matrix(matrix):
         norm = np.linalg.norm(matrix, axis=1)
         norm_matrix = np.zeros(matrix.shape)
 
-        for i in range(matrix):
+        for i in range(len(matrix)):
             norm_matrix[i] = matrix[i] / norm[i]
         return norm_matrix
+
+    def get_sentence_vector(self, sentence):
+        """
+        Wraps fastText.get_sentence_vector and calls lower on the input sentence
+        :param sentence:
+        :return:
+        """
+        vec = self.f.get_sentence_vector(sentence.lower())
+        return vec / np.linalg.norm(vec)
 
     def get_word_vector(self, word):
         """
@@ -40,7 +49,8 @@ class SupervisedModel(object):
         :param word:
         :return:
         """
-        return self.supervised_model.get_word_vector(word)
+        vec = self.f.get_word_vector(word)
+        return vec / np.linalg.norm(vec)
 
     def get_label_vector(self, label):
         """
@@ -53,9 +63,16 @@ class SupervisedModel(object):
 
         if label in self.labels:
             ix = np.where(self.labels == label)
-            vec = self.supervised_model.get_output_matrix()[ix][0]
-            return vec
-        return np.zeros(self.supervised_model.get_dimension())
+            vec = self.f.get_output_matrix()[ix][0]
+            return vec / np.linalg.norm(vec)
+        return np.zeros(self.f.get_dimension())
+
+    @staticmethod
+    def _get_index_for_vector(matrix, vector):
+        cosine_similarity = cosine_sim_matrix(matrix, vector)
+        ix = np.abs(cosine_similarity - cosine_similarity.max()).argmin()
+
+        return cosine_similarity, ix
 
     def get_word_for_vector(self, vector):
         """
@@ -65,7 +82,7 @@ class SupervisedModel(object):
         """
         cosine_similarity, ix = self._get_index_for_vector(self.input_matrix_normalised, vector)
 
-        word = self.supervised_model.get_words()[ix]
+        word = self.f.get_words()[ix]
         return word, cosine_similarity[ix]
 
     def get_label_for_vector(self, vector):
@@ -79,18 +96,11 @@ class SupervisedModel(object):
         word = self.labels
         return word, cosine_similarity[ix]
 
-    @staticmethod
-    def _get_index_for_vector(matrix, vector):
-        cosine_similarity = cosine_sim_matrix(matrix, vector)
-        ix = np.abs(cosine_similarity - cosine_similarity.max()).argmin()
-
-        return cosine_similarity, ix
-
     def keywords(self, text, top_n=10):
-        labels, proba = self.supervised_model.predict(text, top_n)
+        labels, proba = self.f.predict(text, top_n)
 
         # Clean up labels
-        labels = [label.replace(self.prefix, "") if self.label in label else label for label in labels]
+        labels = [label.replace(self.prefix, "") if self.prefix in label else label for label in labels]
 
         result = [{"label": label, "P": P} for label, P in zip(labels, proba)]
 
@@ -98,19 +108,23 @@ class SupervisedModel(object):
         result = sorted(result, key=lambda item: item["P"], reverse=True)
         return result
 
-    def similarity(self, word1, word2):
+    def similarity_by_word(self, word1, word2):
         """
-        Computes the similarity between two word vectors by first normalising them
         :param word1:
         :param word2:
         :return:
         """
-        vec1 = self.model.get_word_vector(word1)
-        vec1 /= np.linalg.norm(vec1)
+        vec1 = self.get_word_vector(word1)
+        vec2 = self.get_word_vector(word2)
+        return self.similarity_by_vector(vec1, vec2)
 
-        vec2 = self.model.get_word_vector(word2)
-        vec2 /= np.linalg.norm(vec2)
-
+    @staticmethod
+    def similarity_by_vector(vec1, vec2):
+        """
+        :param vec1:
+        :param vec2:
+        :return:
+        """
         return cosine_sim(vec1, vec2)
 
 
@@ -118,12 +132,12 @@ def init(app):
     import os
     # Get the model dir from the current app config
     model_dir = app.config["SUPERVISED_VECTOR_MODELS_DIR"]
-    label = app.config.get("SUPERVISED_VECTOR_LABEL", "__label__")
+    label_prefix = app.config.get("SUPERVISED_VECTOR_LABEL", "__label__")
     for model in SupervisedModels:
         fname = "%s/%s" % (model_dir, model.value)
         if os.path.isfile(fname):
             sm = fastText.load_model(fname)
-            _models[model] = SupervisedModel(model, sm, label=label)
+            _models[model] = SupervisedModel(model, sm, prefix=label_prefix)
 
 
 def load_supervised_model(model):

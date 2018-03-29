@@ -59,7 +59,7 @@ $(document).ready(function() {
         var query = getQueryString();
         $.ajax({
             url: "/search/ons?q=" + encodeURI(query),
-            type: "GET",
+            type: "POST",
             success: function(data) {
                 $("ul#search-results").empty()
                 $.each(data.hits, function(i, hit) {

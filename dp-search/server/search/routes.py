@@ -1,4 +1,5 @@
 from flask import request, render_template
+from flask import current_app as app
 
 from . import search, ons_search_engine, hits_to_json
 from ..app import get_request_param
@@ -10,6 +11,17 @@ def execute_search(search_term, **kwargs):
     """
     Simple search API to query Elasticsearch
     """
+    from ..users.user import get_current_user
+
+    # Update user, but dont let it impact search
+    try:
+        user = get_current_user()
+        if user is not None:
+            user.update_user_vector(search_term)
+            user.save()
+    except Exception as e:
+        with app.app_context():
+            app.logger.error("Unable to update user", e)
 
     # Perform the search
     s = ons_search_engine()
