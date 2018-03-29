@@ -10,7 +10,6 @@ class RecommendationEngine(object):
 
     def __init__(self, model):
         assert isinstance(model, SupervisedModel)
-        self.logger = app.logger
         self.model = model
 
     def recommend_labels_for_current_user(self, top_n=10):
@@ -24,5 +23,8 @@ class RecommendationEngine(object):
         user = get_current_user()
         if user is not None:
             top_labels, similarity = self.model.get_labels_for_vector(user.user_array, top_n)
-            return top_labels.tolist()
+            result = [{"keyword": k, "similarity": s} for k, s in zip(top_labels, similarity)]
+            with app.app_context():
+                app.logger.debug("User recommended keywords: %s" % result)
+            return result
         return []

@@ -13,7 +13,9 @@ def create_user(user_id):
 
 
 def user_exists(user_id):
-    return len(User.objects(user_id=user_id)) > 0
+    if user_id:
+        return len(User.objects(user_id=user_id)) > 0
+    return False
 
 
 def find_user(user_id):
@@ -24,17 +26,23 @@ def delete_user(user_id):
     return find_user(user_id).objects.delete()
 
 
-def get_current_user():
+def get_current_user_id():
     from flask import request
     if "_ga" in request.cookies:
         user_id = request.cookies.get("_ga")
-        if user_exists(user_id):
-            return find_user(user_id)
-        else:
-            # Create a user
-            user = create_user(user_id)
-            user.save()
-            return user
+        return user_id
+    return None
+
+
+def get_current_user():
+    user_id = get_current_user_id()
+    if user_id and user_exists(user_id):
+        return find_user(user_id)
+    else:
+        # Create a user
+        user = create_user(user_id)
+        user.save()
+        return user
     return None
 
 
@@ -60,8 +68,6 @@ class User(db.Document):
         else:
             # Move the user vector towards the term vector
             dist = term_vector - user_vec
-            user_vec += dist/4.
+            user_vec += dist / 4.
             self.user_vector = user_vec.tolist()
         self.save()
-
-
