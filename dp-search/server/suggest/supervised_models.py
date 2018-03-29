@@ -74,27 +74,34 @@ class SupervisedModel(object):
 
         return cosine_similarity, ix
 
-    def get_word_for_vector(self, vector):
+    @staticmethod
+    def _get_top_n(words, cosine_similarity, ind, top_n):
+        top_n_words = words[ind][:top_n]
+        top_n_similarity = cosine_similarity[ind][:top_n]
+        return top_n_words, top_n_similarity
+
+    def get_words_for_vector(self, vector, top_n=1):
         """
         Returns the word nearest to the given vector
         :param vector:
         :return:
         """
-        cosine_similarity, ix = self._get_index_for_vector(self.input_matrix_normalised, vector)
+        cosine_similarity = cosine_sim_matrix(self.input_matrix_normalised, vector)
+        ind = np.argsort(-cosine_similarity)
 
-        word = self.f.get_words()[ix]
-        return word, cosine_similarity[ix]
+        words = self.f.get_words()
+        return self._get_top_n(words, cosine_similarity, ind, top_n)
 
-    def get_label_for_vector(self, vector):
+    def get_labels_for_vector(self, vector, top_n=1):
         """
         Returns the label nearest to the given vector
         :param vector:
         :return:
         """
-        cosine_similarity, ix = self._get_index_for_vector(self.output_matrix_normalised, vector)
+        cosine_similarity = cosine_sim_matrix(self.output_matrix_normalised, vector)
+        ind = np.argsort(-cosine_similarity)
 
-        word = self.labels
-        return word, cosine_similarity[ix]
+        return self._get_top_n(self.labels, cosine_similarity, ind, top_n)
 
     def keywords(self, text, top_n=10):
         labels, proba = self.f.predict(text, top_n)

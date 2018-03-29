@@ -18,6 +18,9 @@ def execute_search(search_term, **kwargs):
         user = get_current_user()
         if user is not None:
             user.update_user_vector(search_term)
+        recom = user.get_top_labels(10)
+        with app.app_context():
+            app.logger.info("Recommendation for user '%s': %s" % (user.user_id, recom))
     except Exception as e:
         with app.app_context():
             app.logger.error("Unable to update user", e)

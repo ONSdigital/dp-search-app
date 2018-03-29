@@ -59,11 +59,13 @@ def create_app():
     from .search import search as search_blueprint
     from .suggest import suggest as suggest_blueprint
     from .nlp import nlp as nlp_blueprint
+    from .recommendation import recommendation as recommendation_blueprint
 
     # Register blueprints
     app.register_blueprint(search_blueprint, url_prefix="/search")
     app.register_blueprint(suggest_blueprint, url_prefix="/suggest")
     app.register_blueprint(nlp_blueprint, url_prefix="/nlp")
+    app.register_blueprint(recommendation_blueprint, url_prefix="/recommend")
 
     # Log some setup variables
     app.logger.info("Elasticsearch url: %s" % search_url)

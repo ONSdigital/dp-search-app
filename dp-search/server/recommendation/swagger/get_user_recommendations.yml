@@ -1,0 +1,10 @@
+tags:
+  - recommend
+description: Returns a list of ONS keywords that are recommended for the current user
+parameters:
+  - name: count
+    in: query
+    type: integer
+    required: false
+    default: 5
+    description: Number of keywords to return (if available).

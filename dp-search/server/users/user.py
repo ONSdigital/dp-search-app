@@ -46,8 +46,12 @@ class User(db.Document):
     user_id = db.StringField(required=True)
     user_vector = db.ListField(required=True)
 
+    @property
+    def user_array(self):
+        return np.array(self.user_vector)
+
     def update_user_vector(self, search_term):
-        user_vec = np.array(self.user_vector)
+        user_vec = self.user_array
         term_vector = model.get_sentence_vector(search_term)
 
         # Update the user vector
@@ -55,7 +59,7 @@ class User(db.Document):
             self.user_vector = term_vector.tolist()
         else:
             # Move the user vector towards the term vector
-            dist = term_vector - np.array(self.user_vector)
+            dist = term_vector - user_vec
             user_vec += dist/4.
             self.user_vector = user_vec.tolist()
         self.save()
