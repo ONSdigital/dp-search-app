@@ -58,5 +58,6 @@ class User(db.Document):
             dist = term_vector - np.array(self.user_vector)
             user_vec += dist/4.
             self.user_vector = user_vec.tolist()
+        self.save()
 
 

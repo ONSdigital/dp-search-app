@@ -4,6 +4,7 @@ dp-search-app
 ### Configuration
 
 To configure the application see the "config_*.py" configuration files. Possible common options are:
+
 | Variable             | Default                 | Description
 | -------------------- | ----------------------- | ----------------------------------------------------------------------------------------------------
 | HOST                 | '0.0.0.0'               | Host address of the app.

@@ -18,7 +18,6 @@ def execute_search(search_term, **kwargs):
         user = get_current_user()
         if user is not None:
             user.update_user_vector(search_term)
-            user.save()
     except Exception as e:
         with app.app_context():
             app.logger.error("Unable to update user", e)
