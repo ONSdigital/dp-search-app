@@ -24,5 +24,5 @@ class RecommendationEngine(object):
         user = get_current_user()
         if user is not None:
             top_labels, similarity = self.model.get_labels_for_vector(user.user_array, top_n)
-            return top_labels
+            return top_labels.tolist()
         return []

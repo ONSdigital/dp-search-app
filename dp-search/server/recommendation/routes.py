@@ -18,5 +18,5 @@ def get_user_recommendations():
     top_n = get_request_param("count", False, default=10)
     recommendations = engine.recommend_labels_for_current_user(top_n)
 
-    response = {"user_keywords": recommendations.tolist()}
+    response = {"user_keywords": recommendations}
     return jsonify(response)
