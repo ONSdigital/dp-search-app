@@ -18,7 +18,7 @@ class RecommendationEngine(object):
         :param top_n:
         :return:
         """
-        from ..users.user import get_current_user
+        from ..users.user_utils import get_current_user
 
         user = get_current_user()
         if user is not None:

@@ -2,6 +2,7 @@
 **/**/*.pyc
 .idea/
 build/
+data/
 dp-search/cover/
 dp-search/.coverage
 dp-search-app.log

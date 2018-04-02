@@ -11,16 +11,13 @@ def execute_search(search_term, **kwargs):
     """
     Simple search API to query Elasticsearch
     """
-    from ..users.user import get_current_user
+    from ..users.user_utils import get_current_user
 
-    # Update user, but dont let it impact search
+    # Update user, but don't let it impact search
     try:
         user = get_current_user()
         if user is not None:
             user.update_user_vector(search_term)
-        recom = user.get_top_labels(10)
-        with app.app_context():
-            app.logger.info("Recommendation for user '%s': %s" % (user.user_id, recom))
     except Exception as e:
         with app.app_context():
             app.logger.error("Unable to update user", e)
