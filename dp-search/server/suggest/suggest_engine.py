@@ -134,6 +134,63 @@ class SuggestEngine(object):
         # Return dict ordered by input tokens
         return _sort_dict_by_tokens(suggestions, tokens)
 
+    @staticmethod
+    def word2vec_similar(text, vector_models=WordVectorModels, topn=10):
+        """
+        Returns similar terms for each token in 'text'
+        :param text:
+        :param vector_models:
+        :return:
+        """
+        from word2vec_models import load_model
+        tokens = text.split()
+
+        class SimilarWord(object):
+            def __init__(self, word, score, model):
+                self.word = word
+                self.score = score
+                self.model = model
+
+            def __hash__(self):
+                return hash(self.word)
+
+            def __repr__(self):
+                return str(self.to_dict())
+
+            def __eq__(self, other):
+                return isinstance(other, SimilarWord) and other.word == self.word
+
+            def to_dict(self):
+                return self.__json__()
+
+            def __json__(self):
+                return {
+                    "word": self.word,
+                    "score": self.score,
+                    "model": self.model.name
+                }
+
+        similar = {}
+        for model in vector_models:
+            vec_model = load_model(model)
+
+            for token in tokens:
+                similar_to_token = vec_model.similar_by_word(token, topn=topn * 2)
+                if len(similar_to_token) > 0:
+                    if token not in similar:
+                        similar[token] = set()
+                    for word, score in similar_to_token:
+                        similar_word = SimilarWord(word, score, model)
+                        if similar_word not in similar[token]:
+                            similar[token].add(similar_word)
+
+        # Sort by scores across models and only keep topn
+        for token in similar:
+            sorted_list = sorted(similar[token], key=lambda x: x.score, reverse=True)
+            similar[token] = sorted_list[:topn]
+
+        return similar
+
 
 def _sort_dict_by_tokens(input_dict, tokens):
     sorted_dict = collections.OrderedDict()
