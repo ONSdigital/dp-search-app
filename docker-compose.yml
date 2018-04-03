@@ -1,17 +1,18 @@
 version: '2'
 services:
-   ons_search:
-     build: ./dp-search
-     ports:
-       - "5000:5000"
-     depends_on:
-       - elasticsearch
-       - stanford_ner
-       - mongodb
-     environment:
-       - ELASTICSEARCH_URL=elasticsearch:9200
-       - STANFORD_NER_URL=stanford_ner
-       - STANFORD_NER_PORT=9199
+  ons_search:
+    build: ./dp-search
+    ports:
+      - "5000:5000"
+    depends_on:
+      - elasticsearch
+      - stanford_ner
+      - mongodb
+    environment:
+      - ELASTICSEARCH_URL=elasticsearch:9200
+      - STANFORD_NER_URL=stanford_ner
+      - STANFORD_NER_PORT=9199
+      - MONGO_DB=local
   elasticsearch:
     image: elasticsearch:2.4.2
     ports:
@@ -30,5 +31,5 @@ services:
       volumes:
         - ./data/db:/data/db
       ports:
-          - 27017:27017
+          - "27017:27017"
       command: mongod --smallfiles --logpath=/dev/null # --quiet

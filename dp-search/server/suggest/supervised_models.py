@@ -23,7 +23,7 @@ class SupervisedModel(object):
         self.output_matrix_normalised = self._normalise_matrix(self.f.get_output_matrix())
 
         # Labels
-        self.labels = np.array(self.f.get_labels())
+        self.labels = np.array([l.replace(self.prefix, "") for l in self.f.get_labels()])
 
     @staticmethod
     def _normalise_matrix(matrix):

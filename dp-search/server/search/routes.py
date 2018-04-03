@@ -11,16 +11,20 @@ def execute_search(search_term, **kwargs):
     """
     Simple search API to query Elasticsearch
     """
-    from ..users.user_utils import get_current_user
+    from ..users.user_utils import UserUtils, SessionUtils
 
     # Update user, but don't let it impact search
     try:
-        user = get_current_user()
+        user = UserUtils.get_current_user()
         if user is not None:
-            user.update_user_vector(search_term)
+            session = SessionUtils.get_current_session(user)
+            with app.app_context():
+                app.logger.info("Updating session vector: %s:%s" % (user.user_id, session.session_id))
+            session.update_session_vector(search_term)
     except Exception as e:
         with app.app_context():
-            app.logger.error("Unable to update user", e)
+            app.logger.error("Unable to update user '%s:%s'" % (user.id, user.user_id))
+            app.logger.exception(str(e))
 
     # Perform the search
     s = ons_search_engine()

@@ -12,14 +12,15 @@ from flasgger import swag_from
 @swag_from("swagger/get_user_recommendations.yml")
 @recommendation.route("/user")
 def get_user_recommendations():
-    from ..users.user import user_exists, get_current_user_id
+    from ..users.user_utils import UserUtils
 
-    if user_exists(get_current_user_id()):
+    user = UserUtils.get_current_user()
+    if user:
         model = load_supervised_model(SupervisedModels.ONS)
         engine = RecommendationEngine(model)
 
         top_n = int(get_request_param("count", False, default=10))
-        recommendations = engine.recommend_labels_for_current_user(top_n)
+        recommendations = engine.recommend_labels_for_user(user, top_n)
 
         response = {"user_keywords": recommendations}
         return jsonify(response)
