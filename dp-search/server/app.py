@@ -86,7 +86,7 @@ def create_app():
     # Init swagger API docs
     swagger = Swagger(app)
 
-    print "Has DB:", hasattr(app, "db")
+    app.logger.info("MongoDB and Swagger API docs initialised")
 
     # Redirect from index to apidocs
     @app.route("/")
@@ -94,22 +94,22 @@ def create_app():
         return redirect("/apidocs")
 
     # Declare function to log each request
-    # @app.after_request
-    # def after_request(response):
-    #     """ Logging after every request. """
-    #     # This avoids the duplication of registry in the log,
-    #     # since that 500 is already logged via @app.errorhandler.
-    #     if response.status_code != 500:
-    #         ts = strftime('[%Y-%b-%d %H:%M]')
-    #         app.logger.info('%s %s %s %s %s %s %s',
-    #                         ts,
-    #                         request.remote_addr,
-    #                         request.method,
-    #                         request.scheme,
-    #                         request.full_path,
-    #                         request.cookies,
-    #                         response.status)
-    #     return response
+    @app.after_request
+    def after_request(response):
+        """ Logging after every request. """
+        # This avoids the duplication of registry in the log,
+        # since that 500 is already logged via @app.errorhandler.
+        if response.status_code != 500:
+            ts = strftime('[%Y-%b-%d %H:%M]')
+            app.logger.info('%s %s %s %s %s %s %s',
+                            ts,
+                            request.remote_addr,
+                            request.method,
+                            request.scheme,
+                            request.full_path,
+                            request.cookies,
+                            response.status)
+        return response
 
     # Declare function to log all uncaught exceptions and return a 500 with info
     @app.errorhandler(Exception)
