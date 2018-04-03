@@ -16,6 +16,7 @@ class RecommendationEngine(object):
     def recommend_labels_for_user(self, user, top_n=10):
         """
         Calculates ONS keyword labels for the current user
+        :param user:
         :param top_n:
         :return:
         """

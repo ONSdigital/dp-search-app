@@ -11,5 +11,5 @@ parameters:
 responses:
   200:
     description: User exists.
-  500:
+  400:
     description: User does not exist.

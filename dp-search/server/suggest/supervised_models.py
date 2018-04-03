@@ -9,7 +9,9 @@ _models = {}
 class SupervisedModels(enum.Enum):
     ONS = "ons_supervised.bin"
 
-
+"""
+TODO - Label clustering to reduce memory footprint
+"""
 class SupervisedModel(object):
     def __init__(self, model, supervised_model, prefix="__label__"):
         assert isinstance(model, SupervisedModels)
@@ -19,7 +21,7 @@ class SupervisedModel(object):
         self.prefix = prefix
 
         # Normalised vectors
-        self.input_matrix_normalised = self._normalise_matrix(self.f.get_input_matrix())
+        # self.input_matrix_normalised = self._normalise_matrix(self.f.get_input_matrix())
         self.output_matrix_normalised = self._normalise_matrix(self.f.get_output_matrix())
 
         # Labels
@@ -80,17 +82,20 @@ class SupervisedModel(object):
         top_n_similarity = cosine_similarity[ind][:top_n]
         return top_n_words, top_n_similarity
 
-    def get_words_for_vector(self, vector, top_n=1):
-        """
-        Returns the word nearest to the given vector
-        :param vector:
-        :return:
-        """
-        cosine_similarity = cosine_sim_matrix(self.input_matrix_normalised, vector)
-        ind = np.argsort(-cosine_similarity)
-
-        words = self.f.get_words()
-        return self._get_top_n(words, cosine_similarity, ind, top_n)
+    """
+    Method is disabled due to large memory footprint of input_matrix
+    """
+    # def get_words_for_vector(self, vector, top_n=1):
+    #     """
+    #     Returns the word nearest to the given vector
+    #     :param vector:
+    #     :return:
+    #     """
+    #     cosine_similarity = cosine_sim_matrix(self.input_matrix_normalised, vector)
+    #     ind = np.argsort(-cosine_similarity)
+    #
+    #     words = self.f.get_words()
+    #     return self._get_top_n(words, cosine_similarity, ind, top_n)
 
     def get_labels_for_vector(self, vector, top_n=1):
         """

@@ -14,8 +14,9 @@ from flasgger import swag_from
 def get_user_recommendations():
     from ..users.user_utils import UserUtils
 
-    user = UserUtils.get_current_user()
-    if user:
+    if UserUtils.user_exists(UserUtils.get_current_user_id()):
+        user = UserUtils.get_current_user()
+
         model = load_supervised_model(SupervisedModels.ONS)
         engine = RecommendationEngine(model)
 
