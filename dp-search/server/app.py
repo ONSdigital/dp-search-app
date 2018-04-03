@@ -53,6 +53,9 @@ def create_app():
     file_handler.setFormatter(formatter)
     app.logger.addHandler(file_handler)
 
+    if config_name == "production":
+        app.logger.setLevel(logging.ERROR)
+
     app.logger.info("Initialising application from config '%s'" % config_name)
 
     # Import blueprints
@@ -75,28 +78,38 @@ def create_app():
     word2vec_models.init(app)
     supervised_models.init(app)
 
+    from flasgger import Swagger
+    from flask_mongoengine import MongoEngine
+
+    # Init mongoDB connection
+    app.db = MongoEngine(app)
+    # Init swagger API docs
+    swagger = Swagger(app)
+
+    print "Has DB:", hasattr(app, "db")
+
     # Redirect from index to apidocs
     @app.route("/")
     def index():
         return redirect("/apidocs")
 
     # Declare function to log each request
-    @app.after_request
-    def after_request(response):
-        """ Logging after every request. """
-        # This avoids the duplication of registry in the log,
-        # since that 500 is already logged via @app.errorhandler.
-        if response.status_code != 500:
-            ts = strftime('[%Y-%b-%d %H:%M]')
-            app.logger.info('%s %s %s %s %s %s %s',
-                            ts,
-                            request.remote_addr,
-                            request.method,
-                            request.scheme,
-                            request.full_path,
-                            request.cookies,
-                            response.status)
-        return response
+    # @app.after_request
+    # def after_request(response):
+    #     """ Logging after every request. """
+    #     # This avoids the duplication of registry in the log,
+    #     # since that 500 is already logged via @app.errorhandler.
+    #     if response.status_code != 500:
+    #         ts = strftime('[%Y-%b-%d %H:%M]')
+    #         app.logger.info('%s %s %s %s %s %s %s',
+    #                         ts,
+    #                         request.remote_addr,
+    #                         request.method,
+    #                         request.scheme,
+    #                         request.full_path,
+    #                         request.cookies,
+    #                         response.status)
+    #     return response
 
     # Declare function to log all uncaught exceptions and return a 500 with info
     @app.errorhandler(Exception)
@@ -113,14 +126,14 @@ def create_app():
             "value": str(value_),
             "traceback": traceback.format_tb(traceback_)
         }
-        if app.config["TESTING"] is False:
-            app.logger.error(str(err) + "\n")
         # Jsonify the exception and return a error response
         response = jsonify(err)
         if hasattr(exception, "status_code") and is_number(exception.status_code):
             response.status_code = int(exception.status_code)
         else:
             response.status_code = 500
+            if app.config["TESTING"] is False:
+                app.logger.error(str(err) + "\n")
         return response
 
     return app

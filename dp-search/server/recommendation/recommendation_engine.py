@@ -25,9 +25,8 @@ class RecommendationEngine(object):
         user_vector = user.get_user_vector()
         if user_vector is not None and len(user_vector) > 0:
             top_labels, similarity = self.model.get_labels_for_vector(user_vector, top_n)
-            result = [{"keyword": k, "similarity": s} for k, s in zip(top_labels, similarity)]
+            result = sorted([{"keyword": k, "similarity": s} for k, s in zip(top_labels, similarity)],
+                            key=lambda x: x["similarity"], reverse=True)
 
-            with app.app_context():
-                app.logger.debug("User recommended keywords: %s" % result)
             return result
         return []

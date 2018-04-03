@@ -2,6 +2,7 @@
 import os
 
 from gevent import monkey
+from gevent.pool import Pool
 from gevent.wsgi import WSGIServer
 
 
@@ -27,16 +28,10 @@ def run_tests():
 
 
 def main():
-    from server import app
-    from flasgger import Swagger
-    from flask_mongoengine import MongoEngine
+    from server.app import create_app
 
     # Create the app
-    app = app.create_app()
-    # Init mongoDB connection
-    app.db = MongoEngine(app)
-    # Init swagger API docs
-    swagger = Swagger(app)
+    app = create_app()
 
     # Need to patch sockets to make requests async
     monkey.patch_all()
@@ -45,11 +40,14 @@ def main():
     port = app.config.get("PORT", 5000)
 
     # Start the server
-    http_server = WSGIServer((host, port), app)
+    pool_size = int(os.environ.get("POOL_SIZE", 10))
+    pool = Pool(pool_size)
+    http_server = WSGIServer((host, port), app.wsgi_app, spawn=pool)
 
     # Start server and catch KeyboardInterrupt to allow for graceful shutdown.
     try:
         app.logger.info("Listening on %s:%d" % (host, port))
+        print "Startup complete..."
         http_server.serve_forever()
     except KeyboardInterrupt:
         # Close mongoDB connection
