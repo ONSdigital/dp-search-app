@@ -18,9 +18,10 @@ def execute_search(search_term, **kwargs):
         user = UserUtils.get_current_user()
         if user is not None:
             session = SessionUtils.get_current_session(user)
-            with app.app_context():
-                app.logger.info("Updating session vector: %s:%s" % (user.user_id, session.session_id))
-            session.update_session_vector(search_term)
+            if session is not None:
+                with app.app_context():
+                    app.logger.info("Updating session vector: %s:%s" % (user.user_id, session.session_id))
+                session.update_session_vector(search_term)
     except Exception as e:
         with app.app_context():
             app.logger.error("Unable to update user '%s:%s'" % (user.id, user.user_id))

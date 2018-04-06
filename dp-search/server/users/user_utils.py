@@ -10,7 +10,7 @@ class UserUtils():
     @staticmethod
     def user_exists(user_id):
         if user_id:
-            return len(User.objects(user_id=user_id)) > 0
+            return User.objects(user_id=user_id).count() > 0
         return False
 
     @staticmethod
@@ -74,7 +74,7 @@ class SessionUtils():
         return False
 
     @staticmethod
-    def get_sessions_for_user(user=UserUtils.get_current_user()):
+    def get_sessions_for_user(user):
         assert isinstance(user, User), "Must supply instance of User"
 
         num_sessions = Session.objects(user_id=user.id).count()
@@ -85,7 +85,7 @@ class SessionUtils():
         return Session.objects(user_id=user.id)
 
     @staticmethod
-    def get_latest_session(user=UserUtils.get_current_user()):
+    def get_latest_session(user):
         assert isinstance(user, User), "Must supply instance of User"
 
         # Search for sessions with this users id and sort by descending order based on ObjectId (-id)
@@ -96,7 +96,7 @@ class SessionUtils():
         return None
 
     @staticmethod
-    def get_current_session(user=UserUtils.get_current_user()):
+    def get_current_session(user):
         assert isinstance(user, User), "Must supply instance of User"
 
         session_id = SessionUtils.get_current_session_id()
