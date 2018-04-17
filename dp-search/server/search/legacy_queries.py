@@ -5,23 +5,6 @@ from elasticsearch_dsl import query
 import fields
 
 
-def featured_functions():
-    funcs = [{
-        "filter": {
-            "term": {
-                "_type": "product_page"
-            }
-        }
-    }, {
-        "filter": {
-            "term": {
-                "_type": "home_page_census"
-            }
-        }
-    }]
-    return funcs
-
-
 def functions():
     funcs = [{
         "filter": {
@@ -76,7 +59,7 @@ def functions():
     return funcs
 
 
-def content_query(search_term, functions=None, **kwargs):
+def content_query(search_term, filter_functions=None, **kwargs):
     dis_max = {
         "dis_max": {
             "queries": [{
@@ -141,13 +124,11 @@ def content_query(search_term, functions=None, **kwargs):
         }
     }
 
-    if functions is not None:
+    if filter_functions is not None:
         return query.Q(
-            "function_score", query=dis_max, functions=functions)
+            "function_score", query=dis_max, functions=filter_functions)
     else:
-        return query.Q(
-            "function_score", query=dis_max
-        )
+        return query.Q(dis_max)
 
 
 def type_counts_query():

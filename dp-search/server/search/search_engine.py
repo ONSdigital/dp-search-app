@@ -4,7 +4,7 @@ from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search as Search_api
 
 import fields
-from legacy_queries import content_query, type_counts_query, functions, featured_functions
+from legacy_queries import content_query, type_counts_query, functions
 
 search_url = os.environ.get('ELASTICSEARCH_URL', 'http://localhost:9200')
 
@@ -36,15 +36,18 @@ class SearchEngine(Search_api):
 
     def type_counts_content_query(self, search_term, **kwargs):
         query = {
-            "query": content_query(search_term, functions=functions(), **kwargs),
+            "query": content_query(search_term, filter_functions=functions(), **kwargs),
             "aggs": type_counts_query()
         }
         self.update_from_dict(query)
         return self
 
     def featured_result_query(self, search_term, **kwargs):
+        dis_max = content_query(search_term, **kwargs)
         query = {
-            "query": content_query(search_term, functions=featured_functions(), **kwargs)
+            "size": 1,
+            "query": dis_max.to_dict()
         }
         self.update_from_dict(query)
+        self = self.filter("terms", type=["product_page", "home_page_census"])
         return self

@@ -35,11 +35,9 @@ def execute_search(search_term, **kwargs):
     s = ons_search_engine()
 
     # Perform thr query
-    content_response = s.type_counts_content_query(search_term, **kwargs).execute()
-    # Clear the previous query
-    s.query()
+    content_response = ons_search_engine().type_counts_content_query(search_term, **kwargs).execute()
 
-    featured_result_response = s.featured_result_query(search_term).execute()
+    featured_result_response = ons_search_engine().featured_result_query(search_term).execute()
 
     # Return the hits as JSON
     return hits_to_json(content_response, featured_result_response)
