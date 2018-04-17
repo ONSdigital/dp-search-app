@@ -11,30 +11,38 @@ def execute_search(search_term, **kwargs):
     """
     Simple search API to query Elasticsearch
     """
-    from ..users.user_utils import UserUtils, SessionUtils
-
     # Update user, but don't let it impact search
-    try:
-        user = UserUtils.get_current_user()
-        if user is not None:
-            session = SessionUtils.get_current_session(user)
-            if session is not None:
-                with app.app_context():
-                    app.logger.info("Updating session vector: %s:%s" % (user.user_id, session.session_id))
-                session.update_session_vector(search_term)
-    except Exception as e:
-        with app.app_context():
-            app.logger.error("Unable to update user '%s:%s'" % (user.id, user.user_id))
-            app.logger.exception(str(e))
+    if app.config["SEARCH_ONLY"] is False:
+        from ..users.user_utils import UserUtils, SessionUtils
+
+        try:
+            user = UserUtils.get_current_user()
+            if user is not None:
+                session = SessionUtils.get_current_session(user)
+                if session is not None:
+                    with app.app_context():
+                        app.logger.info("Updating session vector: %s:%s" % (user.user_id, session.session_id))
+                    session.update_session_vector(search_term)
+        except Exception as e:
+            with app.app_context():
+                app.logger.error("Unable to update user '%s:%s'" % (user.id, user.user_id))
+                app.logger.exception(str(e))
 
     # Perform the search
+    """
+    TODO - Replace below with MultiSearch
+    """
     s = ons_search_engine()
 
     # Perform thr query
-    response = s.type_counts_content_query(search_term, **kwargs).execute()
+    content_response = s.type_counts_content_query(search_term, **kwargs).execute()
+    # Clear the previous query
+    s.query()
+
+    featured_result_response = s.featured_result_query(search_term).execute()
 
     # Return the hits as JSON
-    return hits_to_json(response)
+    return hits_to_json(content_response, featured_result_response)
 
 
 @search.route("/")
@@ -51,12 +59,12 @@ def content_query():
     # Get query term from request
     search_term = get_request_param("q", True)
 
-    # Build any must/should/must_not clauses
-    kwargs = {
-        "must": request.form.get("must", "").split(),
-        "should": request.form.get("should", "").split(),
-        "must_not": request.form.get("must_not", "").split()
-    }
+    # # Build any must/should/must_not clauses
+    # kwargs = {
+    #     "must": request.form.get("must", "").split(),
+    #     "should": request.form.get("should", "").split(),
+    #     "must_not": request.form.get("must_not", "").split()
+    # }
 
     # Execute the search
-    return execute_search(search_term, **kwargs)
+    return execute_search(search_term)

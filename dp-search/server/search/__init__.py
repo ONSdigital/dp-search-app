@@ -14,21 +14,49 @@ def ons_search_engine():
     return get_search_engine(_INDEX)
 
 
-def aggs_to_json(aggs):
-    return aggs.__dict__["_d_"]
+def aggs_to_json(aggregations, key):
+    if key in aggregations:
+        aggs = aggregations.__dict__["_d_"][key]
+        buckets = aggs["buckets"]
+
+        result = {}
+        for item in buckets:
+            key = item["key"]
+            count = item["doc_count"]
+            result[key] = count
+
+        return result
+    return {}
 
 
-def hits_to_json(search_response):
-    hits = {
-        "hits": [
-            h.to_dict() for h in search_response.hits
-        ]
+def hits_to_json(content_response, featured_result_response):
+    """
+    Replicates the JSON response of Babbage
+    :param search_response:
+    :return:
+    """
+    num_results = len(content_response.hits)
+
+    aggregations = aggs_to_json(content_response.aggregations, "docCounts")
+
+    response = {
+        "result": {
+            "numberOfResults": num_results,
+            "took": content_response.took,
+            "results": [h.to_dict() for h in content_response.hits],
+            "suggestions": [],
+            "docCounts": {}
+
+        },
+        "counts": {
+            "docCounts": aggregations
+        },
+        "featuredResult": {
+            "results": [h.to_dict() for h in featured_result_response.hits]
+        },
     }
 
-    if hasattr(search_response, "aggregations"):
-        hits["aggs"] = aggs_to_json(search_response.aggregations)
-
-    return jsonify(hits)
+    return jsonify(response)
 
 
 # Import the routes (this should be done last here)

@@ -5,7 +5,78 @@ from elasticsearch_dsl import query
 import fields
 
 
-def content_query(search_term, **kwargs):
+def featured_functions():
+    funcs = [{
+        "filter": {
+            "term": {
+                "_type": "product_page"
+            }
+        }
+    }, {
+        "filter": {
+            "term": {
+                "_type": "home_page_census"
+            }
+        }
+    }]
+    return funcs
+
+
+def functions():
+    funcs = [{
+        "filter": {
+            "term": {
+                "_type": "bulletin"
+            }
+        },
+        "weight": 1.55
+    }, {
+        "filter": {
+            "term": {
+                "_type": "article"
+            }
+        },
+        "weight": 1.3
+    }, {
+        "filter": {
+            "term": {
+                "_type": "article_download"
+            }
+        },
+        "weight": 1.3
+    }, {
+        "filter": {
+            "term": {
+                "_type": "timeseries"
+            }
+        },
+        "weight": 1.2
+    }, {
+        "filter": {
+            "term": {
+                "_type": "compendium_landing_page"
+            }
+        },
+        "weight": 1.3
+    }, {
+        "filter": {
+            "term": {
+                "_type": "static_adhoc"
+            }
+        },
+        "weight": 1.25
+    }, {
+        "filter": {
+            "term": {
+                "_type": "dataset_landing_page"
+            }
+        },
+        "weight": 1.35
+    }]
+    return funcs
+
+
+def content_query(search_term, functions=None, **kwargs):
     dis_max = {
         "dis_max": {
             "queries": [{
@@ -70,74 +141,13 @@ def content_query(search_term, **kwargs):
         }
     }
 
-    functions = [{
-        "filter": {
-            "term": {
-                "_type": "bulletin"
-            }
-        },
-        "weight": 1.55
-    }, {
-        "filter": {
-            "term": {
-                "_type": "article"
-            }
-        },
-        "weight": 1.3
-    }, {
-        "filter": {
-            "term": {
-                "_type": "article_download"
-            }
-        },
-        "weight": 1.3
-    }, {
-        "filter": {
-            "term": {
-                "_type": "timeseries"
-            }
-        },
-        "weight": 1.2
-    }, {
-        "filter": {
-            "term": {
-                "_type": "compendium_landing_page"
-            }
-        },
-        "weight": 1.3
-    }, {
-        "filter": {
-            "term": {
-                "_type": "static_adhoc"
-            }
-        },
-        "weight": 1.25
-    }, {
-        "filter": {
-            "term": {
-                "_type": "dataset_landing_page"
-            }
-        },
-        "weight": 1.35
-    }]
-
-    function_score_query = query.Q(
-        "function_score", query=dis_max, functions=functions)
-
-    # Combine into a bool query if must, should or must_not arguments are given
-    if "must" in kwargs or "should" in kwargs or "must_not" in kwargs:
-        should = [function_score_query]
-        must = []
-        must_not = []
-        if "must" in kwargs:
-            must.extend([content_query(t) for t in kwargs.get("must")])
-        if "should" in kwargs:
-            should.extend([content_query(t) for t in kwargs.get("should")])
-        if "must_not" in kwargs:
-            must_not.extend([content_query(t) for t in kwargs.get("must_not")])
-        return query.Bool(must=must, should=should, must_not=must_not)
-
-    return function_score_query
+    if functions is not None:
+        return query.Q(
+            "function_score", query=dis_max, functions=functions)
+    else:
+        return query.Q(
+            "function_score", query=dis_max
+        )
 
 
 def type_counts_query():
