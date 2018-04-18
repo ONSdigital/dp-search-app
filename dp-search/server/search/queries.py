@@ -52,7 +52,7 @@ def content_query(search_term, function_scores=None):
     """
     Returns the default ONS content query
     :param search_term:
-    :param functions:
+    :param function_scores:
     :return:
     """
     q = query.DisMax(

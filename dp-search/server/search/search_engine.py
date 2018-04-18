@@ -39,26 +39,41 @@ class SearchEngine(Search_api):
         s = s.query(query).sort(sort)
         return s
 
+    def highlight_title(self, search_term):
+        s = self._clone()
+        s = s.highlight(fields.title.name, fragment_size=0, pre_tags=["<strong>"], post_tags=["</strong>"])
+        return s
+
     def type_counts_content_query(self, search_term, **kwargs):
         s = self._clone()
+
+        function_scores = kwargs.pop("function_scores", content_filter_functions())
+
         query = {
-            "query": content_query(search_term, function_scores=content_filter_functions(), **kwargs),
+            "query": content_query(search_term, function_scores=function_scores),
             "aggs": type_counts_query()
         }
+        # Update query from dict
         s.update_from_dict(query)
-        s = s.highlight(fields.title.name, fragment_size=0, pre_tags=["<strong>"], post_tags=["</strong>"])
+
+        # Highlight
+        s = s.highlight_title(search_term)
         return s
 
     def featured_result_query(self, search_term, **kwargs):
         s = self._clone()
-        dis_max = content_query(search_term, **kwargs)
+        dis_max = content_query(search_term)
         query = {
             "size": 1,
             "query": dis_max.to_dict()
         }
+        # Update query from dict
         s.update_from_dict(query)
+
+        # Add filters
         s = s.filter("terms", type=["product_page", "home_page_census"])
-        s = s.highlight(fields.title.name, fragment_size=0, pre_tags=["<strong>"], post_tags=["</strong>"])
+        # Add highlights
+        s = s.highlight_title(search_term)
         return s
 
 

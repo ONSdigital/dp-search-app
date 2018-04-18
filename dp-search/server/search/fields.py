@@ -1,5 +1,4 @@
 class Field(object):
-
     def __init__(self, name, boost=None, highlight=False):
         self.name = name
         self.boost = boost

@@ -32,9 +32,8 @@ def execute_search(search_term, **kwargs):
     """
     TODO - Replace below with MultiSearch
     """
-    s = ons_search_engine()
 
-    # Perform thr query
+    # Perform the query
     content_response = ons_search_engine().type_counts_content_query(search_term, **kwargs).execute()
 
     featured_result_response = ons_search_engine().featured_result_query(search_term).execute()
@@ -56,6 +55,11 @@ def content_query():
     """
     # Get query term from request
     search_term = get_request_param("q", True)
+
+    """
+    TODO - implement filter (update get_request_param to return list of values if key specified
+    multiple times)
+    """
 
     # # Build any must/should/must_not clauses
     # kwargs = {

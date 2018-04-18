@@ -1,52 +1,27 @@
+from content_types import *
+
+
+def content_type_filter_function(content_type):
+    return {
+        "filter": {
+            "term": {
+                "_type": content_type.name
+            },
+        },
+        "weight": content_type.weight
+    }
+
+
 def content_filter_functions():
-    funcs = [{
-        "filter": {
-            "term": {
-                "_type": "bulletin"
-            }
-        },
-        "weight": 1.55
-    }, {
-        "filter": {
-            "term": {
-                "_type": "article"
-            }
-        },
-        "weight": 1.3
-    }, {
-        "filter": {
-            "term": {
-                "_type": "article_download"
-            }
-        },
-        "weight": 1.3
-    }, {
-        "filter": {
-            "term": {
-                "_type": "timeseries"
-            }
-        },
-        "weight": 1.2
-    }, {
-        "filter": {
-            "term": {
-                "_type": "compendium_landing_page"
-            }
-        },
-        "weight": 1.3
-    }, {
-        "filter": {
-            "term": {
-                "_type": "static_adhoc"
-            }
-        },
-        "weight": 1.25
-    }, {
-        "filter": {
-            "term": {
-                "_type": "dataset_landing_page"
-            }
-        },
-        "weight": 1.35
-    }]
+    """
+    Returns filter functions used in a content_query
+    :return:
+    """
+    types = [bulletin, article, article_download, timeseries, compendium_landing_page,
+             static_adhoc, dataset_landing_page]
+
+    funcs = []
+
+    for content_type in types:
+        funcs.append(content_type_filter_function(content_type))
     return funcs
