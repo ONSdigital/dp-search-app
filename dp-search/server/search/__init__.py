@@ -43,22 +43,30 @@ def marshall_hits(hits):
             for fragment in hit.meta.highlight[fields.title.name]:
                 if fragment.startswith("<strong>"):
                     highlighted_text = fragment.replace("<strong>", "").replace("</strong>", "")
-                    hit_dict["description"]["title"] = hit_dict["description"]["title"].replace(highlighted_text,
-                                                                                                    fragment)
+
+                    hit_dict["description"]["title"] = hit_dict["description"]["title"].replace(
+                        highlighted_text,
+                        fragment)
+
+                    hit_dict["description"]["title"] = hit_dict["description"]["title"].replace(
+                        highlighted_text.lower(),
+                        fragment.lower())
+
         hits_list.append(hit_dict)
     return hits_list
 
 
-def hits_to_json(content_response, featured_result_response):
+def hits_to_json(content_response, type_counts_response, featured_result_response):
     """
     Replicates the JSON response of Babbage
     :param content_response:
+    :param type_counts_response:
     :param featured_result_response:
     :return:
     """
     num_results = len(content_response.hits)
 
-    aggregations = aggs_to_json(content_response.aggregations, "docCounts")
+    aggregations = aggs_to_json(type_counts_response.aggregations, "docCounts")
 
     response = {
         "result": {

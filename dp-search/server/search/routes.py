@@ -34,12 +34,14 @@ def execute_search(search_term, **kwargs):
     """
 
     # Perform the query
-    content_response = ons_search_engine().type_counts_content_query(search_term, **kwargs).execute()
+    content_response = ons_search_engine().content_query(search_term, **kwargs).execute()
+
+    type_counts_response = ons_search_engine().type_counts_query(search_term, **kwargs).execute()
 
     featured_result_response = ons_search_engine().featured_result_query(search_term).execute()
 
     # Return the hits as JSON
-    return hits_to_json(content_response, featured_result_response)
+    return hits_to_json(content_response, type_counts_response, featured_result_response)
 
 
 @search.route("/")
@@ -55,11 +57,7 @@ def content_query():
     """
     # Get query term from request
     search_term = get_request_param("q", True)
-
-    """
-    TODO - implement filter (update get_request_param to return list of values if key specified
-    multiple times)
-    """
+    type_filters = get_request_param("filter", False, None)
 
     # # Build any must/should/must_not clauses
     # kwargs = {
@@ -69,4 +67,4 @@ def content_query():
     # }
 
     # Execute the search
-    return execute_search(search_term)
+    return execute_search(search_term, type_filters=type_filters)

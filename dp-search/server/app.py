@@ -18,9 +18,12 @@ def get_request_param(key, required, default=None):
     :raises ValueError: key not found or value is None
     """
     if key in request.args:
-        value = request.args.get(key)
-        if value is not None and len(value) > 0:
-            return value
+        values = request.args.getlist(key)
+        if values is not None and len(values) > 0:
+            if len(values) == 1:
+                return values[0]
+            else:
+                return values
     if required:
         message = "Invalid value for required argument '%s' and route '%s'" % (key, request.url)
         # Will be automatically caught by handle_exception and return a 400

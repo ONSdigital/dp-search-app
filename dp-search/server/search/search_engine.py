@@ -31,20 +31,29 @@ class SearchEngine(Search_api):
         super(SearchEngine, self).__init__(**kwargs)
         self.info = self._using.info()
 
-    def legacy_content_query(self, search_term, **kwargs):
-        s = self._clone()
-
-        sort = {fields.releaseDate.name: {"order": "desc"}}
-        query = content_query(search_term, **kwargs)
-        s = s.query(query).sort(sort)
-        return s
-
-    def highlight_title(self, search_term):
+    def highlight_title(self):
         s = self._clone()
         s = s.highlight(fields.title.name, fragment_size=0, pre_tags=["<strong>"], post_tags=["</strong>"])
         return s
 
-    def type_counts_content_query(self, search_term, **kwargs):
+    def content_query(self, search_term, **kwargs):
+        s = self._clone()
+
+        function_scores = kwargs.pop("function_scores", content_filter_functions())
+        type_filters = kwargs.pop("type_filters", None)
+
+        s = s.query(content_query(search_term, function_scores))
+
+        if type_filters is not None:
+            if hasattr(type_filters, "__iter__") is False:
+                type_filters = [type_filters]
+            s = s.filter("terms", type=type_filters)
+
+        # Highlight
+        s = s.highlight_title()
+        return s
+
+    def type_counts_query(self, search_term, **kwargs):
         s = self._clone()
 
         function_scores = kwargs.pop("function_scores", content_filter_functions())
@@ -55,9 +64,6 @@ class SearchEngine(Search_api):
         }
         # Update query from dict
         s.update_from_dict(query)
-
-        # Highlight
-        s = s.highlight_title(search_term)
         return s
 
     def featured_result_query(self, search_term, **kwargs):
@@ -73,7 +79,7 @@ class SearchEngine(Search_api):
         # Add filters
         s = s.filter("terms", type=["product_page", "home_page_census"])
         # Add highlights
-        s = s.highlight_title(search_term)
+        s = s.highlight_title()
         return s
 
 
