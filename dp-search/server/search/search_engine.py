@@ -2,9 +2,11 @@ import os
 
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search as Search_api
+from elasticsearch_dsl import MultiSearch as MultiSearch_api
 
 import fields
-from legacy_queries import content_query, type_counts_query, functions
+from queries import content_query, type_counts_query
+from filter_functions import content_filter_functions
 
 search_url = os.environ.get('ELASTICSEARCH_URL', 'http://localhost:9200')
 
@@ -30,24 +32,33 @@ class SearchEngine(Search_api):
         self.info = self._using.info()
 
     def legacy_content_query(self, search_term, **kwargs):
+        s = self._clone()
+
         sort = {fields.releaseDate.name: {"order": "desc"}}
         query = content_query(search_term, **kwargs)
-        return self.query(query).sort(sort)
+        s = s.query(query).sort(sort)
+        return s
 
     def type_counts_content_query(self, search_term, **kwargs):
         query = {
-            "query": content_query(search_term, filter_functions=functions(), **kwargs),
+            "query": content_query(search_term, function_scores=content_filter_functions(), **kwargs),
             "aggs": type_counts_query()
         }
         self.update_from_dict(query)
         return self
 
     def featured_result_query(self, search_term, **kwargs):
+        s = self._clone()
         dis_max = content_query(search_term, **kwargs)
         query = {
             "size": 1,
             "query": dis_max.to_dict()
         }
-        self.update_from_dict(query)
-        self = self.filter("terms", type=["product_page", "home_page_census"])
-        return self
+        s.update_from_dict(query)
+        s = s.filter("terms", type=["product_page", "home_page_census"])
+        return s
+
+
+class MultiSearchEngine(MultiSearch_api):
+    def __init__(self, **kwargs):
+        super(MultiSearchEngine, self).__init__(**kwargs)
