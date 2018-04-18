@@ -50,7 +50,6 @@ def marshall_hits(hits):
     return hits_list
 
 
-
 def hits_to_json(content_response, featured_result_response):
     """
     Replicates the JSON response of Babbage
