@@ -13,3 +13,12 @@ dp-search/vector_models/
 vegeta/vegeta
 vegeta/results.bin
 vegeta/vegeta-v6.3.0-darwin-386.tar.gz
+
+cookie-jar.txt
+stanford-nlp/META-INF/
+stanford-nlp/StanfordCoreNLP.properties
+stanford-nlp/edu/
+stanford-nlp/english.muc.7class.caseless.distsim.crf.ser.gz
+stanford-nlp/stanford-english-corenlp-2018-02-27-models.jar
+stanford-nlp/stanford-ner-2018-02-27.zip
+stanford-nlp/stanford-ner-2018-02-27/

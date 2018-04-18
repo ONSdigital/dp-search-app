@@ -5,4 +5,4 @@ if [ ! -f ./vegeta ]; then
     tar -xvf vegeta-v6.3.0-darwin-386.tar.gz
 fi
 
-echo "GET http://localhost:5000/search/ons?q=cpi" | ./vegeta attack -duration=5s -connections 10 -rate 500 | tee results.bin | ./vegeta report
+echo "GET http://localhost:5000/recommend/user?count=10" | ./vegeta attack -duration=5s -connections 10 -rate 1000 | tee results.bin | ./vegeta report
