@@ -80,6 +80,7 @@ def content_query(search_term, function_scores=None):
     else:
         return query.FunctionScore(query=q, functions=function_scores)
 
+
 def type_counts_query():
     type_count_query = {
         "docCounts": {

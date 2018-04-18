@@ -40,12 +40,14 @@ class SearchEngine(Search_api):
         return s
 
     def type_counts_content_query(self, search_term, **kwargs):
+        s = self._clone()
         query = {
             "query": content_query(search_term, function_scores=content_filter_functions(), **kwargs),
             "aggs": type_counts_query()
         }
-        self.update_from_dict(query)
-        return self
+        s.update_from_dict(query)
+        s = s.highlight(fields.title.name, fragment_size=0, pre_tags=["<strong>"], post_tags=["</strong>"])
+        return s
 
     def featured_result_query(self, search_term, **kwargs):
         s = self._clone()
@@ -56,6 +58,7 @@ class SearchEngine(Search_api):
         }
         s.update_from_dict(query)
         s = s.filter("terms", type=["product_page", "home_page_census"])
+        s = s.highlight(fields.title.name, fragment_size=0, pre_tags=["<strong>"], post_tags=["</strong>"])
         return s
 
 

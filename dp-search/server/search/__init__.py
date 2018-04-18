@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify
 from .search_engine import get_search_engine
 import os
+import fields
 
 # Create the search blueprint
 search = Blueprint("search", __name__)
@@ -29,6 +30,27 @@ def aggs_to_json(aggregations, key):
     return {}
 
 
+def marshall_hits(hits):
+    """
+    Substitues highlights into fields and returns valid JSON
+    :param hits:
+    :return:
+    """
+    hits_list = []
+    for hit in hits:
+        hit_dict = hit.to_dict()
+        if hasattr(hit.meta, "highlight") and fields.title.name in hit.meta.highlight:
+            for item in hit.meta.highlight:
+                for fragment in hit.meta.highlight[item]:
+                    if fragment.startswith("<strong>"):
+                        highlighted_text = fragment.replace("<strong>", "").replace("</strong>", "")
+                        hit_dict["description"]["title"] = hit_dict["description"]["title"].replace(highlighted_text,
+                                                                                                    fragment)
+        hits_list.append(hit_dict)
+    return hits_list
+
+
+
 def hits_to_json(content_response, featured_result_response):
     """
     Replicates the JSON response of Babbage
@@ -43,7 +65,7 @@ def hits_to_json(content_response, featured_result_response):
         "result": {
             "numberOfResults": num_results,
             "took": content_response.took,
-            "results": [h.to_dict() for h in content_response.hits],
+            "results": marshall_hits(content_response.hits),
             "suggestions": [],
             "docCounts": {}
 
