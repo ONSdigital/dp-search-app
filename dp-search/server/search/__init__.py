@@ -16,6 +16,7 @@ def ons_search_engine():
 
 
 def aggs_to_json(aggregations, key):
+    total = 0
     if key in aggregations:
         aggs = aggregations.__dict__["_d_"][key]
         buckets = aggs["buckets"]
@@ -25,8 +26,9 @@ def aggs_to_json(aggregations, key):
             key = item["key"]
             count = item["doc_count"]
             result[key] = count
+            total += count
 
-        return result
+        return result, total
     return {}
 
 
@@ -52,6 +54,7 @@ def marshall_hits(hits):
                         highlighted_text.lower(),
                         fragment.lower())
 
+        hit_dict["_type"] = hit_dict.pop("type")  # rename 'type' field to '_type'
         hits_list.append(hit_dict)
     return hits_list
 
@@ -66,7 +69,7 @@ def hits_to_json(content_response, type_counts_response, featured_result_respons
     """
     num_results = len(content_response.hits)
 
-    aggregations = aggs_to_json(type_counts_response.aggregations, "docCounts")
+    aggregations, total = aggs_to_json(type_counts_response.aggregations, "docCounts")
 
     response = {
         "result": {
@@ -78,6 +81,7 @@ def hits_to_json(content_response, type_counts_response, featured_result_respons
 
         },
         "counts": {
+            "numberOfResults": total,
             "docCounts": aggregations
         },
         "featuredResult": {

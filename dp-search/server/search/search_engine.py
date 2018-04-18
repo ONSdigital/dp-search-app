@@ -7,6 +7,7 @@ from elasticsearch_dsl import MultiSearch as MultiSearch_api
 import fields
 from queries import content_query, type_counts_query
 from filter_functions import content_filter_functions
+from type_filter import all_filter_funcs
 
 search_url = os.environ.get('ELASTICSEARCH_URL', 'http://localhost:9200')
 
@@ -22,6 +23,8 @@ def get_search_engine(index, timeout=1000):
 """
 TODO - Implement MultiSearch:
 http://elasticsearch-dsl.readthedocs.io/en/latest/search_dsl.html?highlight=multisearch#multisearch
+
+TODO - Implement sortBy request param.
 """
 
 
@@ -42,7 +45,13 @@ class SearchEngine(Search_api):
         function_scores = kwargs.pop("function_scores", content_filter_functions())
         type_filters = kwargs.pop("type_filters", None)
 
-        s = s.query(content_query(search_term, function_scores))
+        query = {
+            "query": content_query(search_term, function_scores=function_scores),
+            "aggs": type_counts_query()
+        }
+
+        # Update query from dict
+        s.update_from_dict(query)
 
         if type_filters is not None:
             if hasattr(type_filters, "__iter__") is False:
@@ -54,17 +63,14 @@ class SearchEngine(Search_api):
         return s
 
     def type_counts_query(self, search_term, **kwargs):
-        s = self._clone()
-
-        function_scores = kwargs.pop("function_scores", content_filter_functions())
-
-        query = {
-            "query": content_query(search_term, function_scores=function_scores),
-            "aggs": type_counts_query()
-        }
-        # Update query from dict
-        s.update_from_dict(query)
-        return s
+        """
+        TODO - Fix bug where docCounts does not match number of items returned by filter
+        :param search_term:
+        :param kwargs:
+        :return:
+        """
+        type_filters = all_filter_funcs()
+        return self.content_query(search_term, type_filters=type_filters)
 
     def featured_result_query(self, search_term, **kwargs):
         s = self._clone()

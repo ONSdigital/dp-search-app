@@ -9,14 +9,15 @@ class ContentType(object):
         self.weight = weight
 
 
+# Content types
 home_page = ContentType("hone_page")
 home_page_census = ContentType("home_page_census")
 taxonomy_landing_page = ContentType("taxonomy_landing_page")
 product_page = ContentType("product_page")
 bulletin = ContentType("bulletin", 1.55)
 article = ContentType("article", 1.30)
-article_download = ContentType("article_download")
-timeseries = ContentType("timeseries")
+article_download = ContentType("article_download", 1.30)
+timeseries = ContentType("timeseries", 1.2)
 data_slice = ContentType("data_slice")
 compendium_landing_page = ContentType("compendium_landing_page", 1.30)
 compendium_chapter = ContentType("compendium_chapter")
