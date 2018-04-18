@@ -89,10 +89,11 @@ def create_app():
 
     # Init mongoDB connection
     app.db = MongoEngine(app)
-    # Init swagger API docs
-    swagger = Swagger(app)
-
-    app.logger.info("MongoDB and Swagger API docs initialised")
+    app.logger.info("MongoDB initialised")
+    if config_name == "development":
+        # Init swagger API docs
+        swagger = Swagger(app)
+        app.logger.info("Swagger API docs initialised")
 
     # Redirect from index to apidocs
     @app.route("/")
