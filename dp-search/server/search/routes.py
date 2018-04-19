@@ -1,7 +1,9 @@
-from flask import request, render_template
+from flask import render_template
 from flask import current_app as app
 
-from . import search, ons_search_engine, hits_to_json
+from . import search, ons_search_engine, hits_to_json, aggs_to_json
+from paginator import Paginator, MAX_VISIBLE_PAGINATOR_LINK, RESULTS_PER_PAGE
+
 from ..app import get_request_param
 
 from flasgger import swag_from
@@ -33,15 +35,21 @@ def execute_search(search_term, **kwargs):
     TODO - Replace below with MultiSearch
     """
 
-    # Perform the query
-    content_response = ons_search_engine().content_query(search_term, **kwargs).execute()
-
     type_counts_response = ons_search_engine().type_counts_query(search_term, **kwargs).execute()
+    aggregations, total_hits = aggs_to_json(type_counts_response.aggregations, "docCounts")
 
-    featured_result_response = ons_search_engine().featured_result_query(search_term).execute()
+    page_number = int(get_request_param("page", False, 1))
+    paginator = Paginator(total_hits, MAX_VISIBLE_PAGINATOR_LINK, page_number, RESULTS_PER_PAGE)
+
+    # Perform the query
+    content_response = ons_search_engine().content_query(search_term, paginator, **kwargs).execute()
+
+    featured_result_response = None
+    if paginator.current_page <= 1:
+        featured_result_response = ons_search_engine().featured_result_query(search_term).execute()
 
     # Return the hits as JSON
-    return hits_to_json(content_response, type_counts_response, featured_result_response)
+    return hits_to_json(content_response, aggregations, total_hits, paginator, featured_result_response=featured_result_response)
 
 
 @search.route("/")

@@ -59,33 +59,37 @@ def marshall_hits(hits):
     return hits_list
 
 
-def hits_to_json(content_response, type_counts_response, featured_result_response):
+def hits_to_json(content_response, aggregations, total_hits, paginator, featured_result_response=None):
     """
     Replicates the JSON response of Babbage
     :param content_response:
     :param type_counts_response:
     :param featured_result_response:
+    :param page_number:
     :return:
     """
-    num_results = len(content_response.hits)
 
-    aggregations, total = aggs_to_json(type_counts_response.aggregations, "docCounts")
+    featured_result_hits = []
+    if featured_result_response is not None:
+        featured_result_hits = [h.to_dict() for h in featured_result_response.hits]
 
     response = {
         "result": {
-            "numberOfResults": num_results,
+            "numberOfResults": total_hits,
             "took": content_response.took,
             "results": marshall_hits(content_response.hits),
             "suggestions": [],
-            "docCounts": {}
+            "docCounts": {},
+            "paginator": paginator
 
         },
         "counts": {
-            "numberOfResults": total,
+            "numberOfResults": total_hits,
             "docCounts": aggregations
         },
         "featuredResult": {
-            "results": [h.to_dict() for h in featured_result_response.hits]
+            "numberOfResults": len(featured_result_hits),
+            "results": featured_result_hits
         },
     }
 

@@ -39,16 +39,26 @@ class SearchEngine(Search_api):
         s = s.highlight(fields.title.name, fragment_size=0, pre_tags=["<strong>"], post_tags=["</strong>"])
         return s
 
-    def content_query(self, search_term, **kwargs):
+    def content_query(self, search_term, paginator=None, **kwargs):
         s = self._clone()
 
         function_scores = kwargs.pop("function_scores", content_filter_functions())
         type_filters = kwargs.pop("type_filters", None)
 
-        query = {
-            "query": content_query(search_term, function_scores=function_scores),
-            "aggs": type_counts_query()
-        }
+        if paginator is not None:
+            from_start = 0 if paginator.current_page <= 1 else (paginator.current_page - 1) * paginator.size
+
+            query = {
+                "from": from_start,
+                "size": paginator.size,
+                "query": content_query(search_term, function_scores=function_scores),
+                "aggs": type_counts_query()
+            }
+        else:
+            query = {
+                "query": content_query(search_term, function_scores=function_scores),
+                "aggs": type_counts_query()
+            }
 
         # Update query from dict
         s.update_from_dict(query)
