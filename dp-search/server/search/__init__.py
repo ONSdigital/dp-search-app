@@ -32,7 +32,7 @@ def aggs_to_json(aggregations, key):
             total += count
 
         return result, total
-    return {}
+    return {}, total
 
 
 def get_var(input_dict, accessor_string):
@@ -49,34 +49,37 @@ def marshall_hits(hits):
     :param hits:
     :return:
     """
+    import re
+
     hits_list = []
     for hit in hits:
         hit_dict = Hit(hit.to_dict())
         if hasattr(hit.meta, "highlight"):
-            for field in fields.field_list:
-                if field.highlight and field.name in hit.meta.highlight:
-                    for fragment in hit.meta.highlight[field.name]:
-                        fragment = fragment.strip()
-                        if fragment.startswith("<strong>"):
-                            highlighted_text = fragment.replace("<strong>", "").replace("</strong>", "")
+            highlight_dict = hit.meta.highlight.to_dict()
+            for highlight_key in highlight_dict:
+                for fragment in highlight_dict[highlight_key]:
+                    fragment = fragment.strip()
+                    if "<strong>" in fragment and "</strong>" in fragment:
+                        highlighted_text = " ".join(re.findall("<strong>(.*?)</strong>", fragment))
 
-                            val = get_var(hit_dict, field.name)
+                        val = get_var(hit_dict, highlight_key)
 
-                            val = val.replace(
-                                highlighted_text,
-                                "<strong>%s</strong>" % highlighted_text)
+                        val = val.replace(
+                            highlighted_text,
+                            "<strong>%s</strong>" % highlighted_text)
 
-                            val = val.replace(
-                                highlighted_text.lower(),
-                                "<strong>%s</strong>" % highlighted_text.lower())
-                            hit_dict.set_value(field.name, val)
+                        val = val.replace(
+                            highlighted_text.lower(),
+                            "<strong>%s</strong>" % highlighted_text.lower())
+
+                        hit_dict.set_value(highlight_key, val)
 
         hit_dict["_type"] = hit_dict.pop("type")  # rename 'type' field to '_type'
         hits_list.append(hit_dict)
     return hits_list
 
 
-def hits_to_json(content_response, aggregations, total_hits, paginator, featured_result_response=None):
+def hits_to_json(content_response, aggregations, paginator, featured_result_response=None):
     """
     Replicates the JSON response of Babbage
     :param content_response:
@@ -92,7 +95,7 @@ def hits_to_json(content_response, aggregations, total_hits, paginator, featured
 
     response = {
         "result": {
-            "numberOfResults": total_hits,
+            "numberOfResults": content_response.hits.total,
             "took": content_response.took,
             "results": marshall_hits(content_response.hits),
             "suggestions": [],
@@ -101,7 +104,7 @@ def hits_to_json(content_response, aggregations, total_hits, paginator, featured
 
         },
         "counts": {
-            "numberOfResults": total_hits,
+            "numberOfResults": content_response.hits.total,
             "docCounts": aggregations
         },
         "featuredResult": {

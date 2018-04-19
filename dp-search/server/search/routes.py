@@ -55,7 +55,7 @@ def execute_search(search_term, **kwargs):
         featured_result_response = s.execute()
 
     # Return the hits as JSON
-    return hits_to_json(content_response, aggregations, total_hits, paginator, featured_result_response=featured_result_response)
+    return hits_to_json(content_response, aggregations, paginator, featured_result_response=featured_result_response)
 
 
 @search.route("/")

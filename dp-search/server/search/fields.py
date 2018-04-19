@@ -44,4 +44,6 @@ field_list = [uri, _score, title_no_dates, title_first_letter, title_raw, title,
               metaDescription, keywords, _type, cdid, datasetId, searchBoost, latestRelease, \
               published, cancelled, topics]
 
+highlight_fields = [f for f in field_list if f.highlight]
+
 suggestion_field = title_no_synonym_no_stem

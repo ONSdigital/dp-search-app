@@ -37,9 +37,10 @@ class SearchEngine(Search_api):
     def highlight_fields(self):
         s = self._clone()
 
-        for field in fields.field_list:
-            if field.highlight:
-                s = s.highlight(field.name, fragment_size=0, pre_tags=["<strong>"], post_tags=["</strong>"])
+        field_names = [field.name for field in fields.highlight_fields]
+
+        s = s.highlight(*field_names, fragment_size=0, pre_tags=["<strong>"], post_tags=["</strong>"])
+
         return s
 
     def content_query(self, search_term, paginator=None, **kwargs):
