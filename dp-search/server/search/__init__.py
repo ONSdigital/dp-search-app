@@ -43,6 +43,17 @@ def get_var(input_dict, accessor_string):
     return current_data
 
 
+def _highlight(highlighted_text, val):
+    val = val.replace(
+        highlighted_text,
+        "<strong>%s</strong>" % highlighted_text)
+
+    val = val.replace(
+        highlighted_text.lower(),
+        "<strong>%s</strong>" % highlighted_text.lower())
+    return val
+
+
 def marshall_hits(hits):
     """
     Substitues highlights into fields and returns valid JSON
@@ -64,15 +75,13 @@ def marshall_hits(hits):
 
                         val = get_var(hit_dict, highlight_key)
 
-                        val = val.replace(
-                            highlighted_text,
-                            "<strong>%s</strong>" % highlighted_text)
-
-                        val = val.replace(
-                            highlighted_text.lower(),
-                            "<strong>%s</strong>" % highlighted_text.lower())
-
-                        hit_dict.set_value(highlight_key, val)
+                        if hasattr(val, "__iter__"):
+                            highlighted_vals = []
+                            for v in val:
+                                highlighted_vals.append(_highlight(highlighted_text, v))
+                            hit_dict.set_value(highlight_key, highlighted_vals)
+                        else:
+                            hit_dict.set_value(highlight_key, _highlight(highlighted_text, val))
 
         hit_dict["_type"] = hit_dict.pop("type")  # rename 'type' field to '_type'
         hits_list.append(hit_dict)

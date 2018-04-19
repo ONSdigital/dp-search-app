@@ -14,14 +14,14 @@ class Paginator(object):
         self.number_of_pages = Paginator.calculate_number_of_pages(number_of_results, result_per_page)
         self.end = Paginator.calculate_end(self.number_of_pages, current_page, max_visible_links)
         self.start = Paginator.calculate_start(self.number_of_pages, max_visible_links, self.end)
-        self.pages = Paginator.get_page_list(self.start, self.end)
+        self.pages = self.get_page_list()
         self.size = int(result_per_page)
 
     @staticmethod
     def calculate_end(number_of_pages, current_page, max_visible):
-        max_pages = float(number_of_pages)
+        max_pages = number_of_pages
         if max_pages < max_visible:
-            return max_pages
+            return int(max_pages)
         # Half of the pages are visible after current page
         end = float(current_page) + math.ceil(float(max_visible) / 2.0)
 
@@ -40,9 +40,8 @@ class Paginator(object):
     def calculate_number_of_pages(number_of_results, results_per_page):
         return int(math.ceil(float(number_of_results) / float(results_per_page)))
 
-    @staticmethod
-    def get_page_list(start, end):
-        page_list = range(start, end + 1)
+    def get_page_list(self):
+        page_list = range(self.start, self.end + 1)
         return page_list
 
     def __json__(self):
