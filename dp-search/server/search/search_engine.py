@@ -70,6 +70,12 @@ class SearchEngine(Search_api):
 
         # Highlight
         s = s.highlight_title()
+
+        # Sort
+        s = s.sort(
+            {"_score": {"order": "desc"}},
+            {fields.releaseDate.name: {"order": "desc"}}
+        )
         return s
 
     def type_counts_query(self, search_term, **kwargs):

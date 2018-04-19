@@ -6,6 +6,9 @@ RESULTS_PER_PAGE = int(os.getenv("RESULTS_PER_PAGE", 10))
 
 
 class Paginator(object):
+    """
+    Paginator class - replicates pagination functionality from babbage
+    """
     def __init__(self, number_of_results, max_visible_links, current_page, result_per_page):
         self.current_page = current_page
         self.number_of_pages = Paginator.calculate_number_of_pages(number_of_results, result_per_page)
