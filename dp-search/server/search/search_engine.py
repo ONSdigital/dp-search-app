@@ -25,7 +25,7 @@ def get_search_engine(index, timeout=1000):
 TODO - Implement MultiSearch:
 http://elasticsearch-dsl.readthedocs.io/en/latest/search_dsl.html?highlight=multisearch#multisearch
 
-TODO - Implement sortBy request param.
+TODO - Investigate ordered of results for query 'crime'
 """
 
 
