@@ -5,6 +5,7 @@ from elasticsearch_dsl import Search as Search_api
 from elasticsearch_dsl import MultiSearch as MultiSearch_api
 
 import fields
+from sort_by import SortFields, query_sort
 from queries import content_query, type_counts_query
 from filter_functions import content_filter_functions
 from type_filter import all_filter_funcs
@@ -75,11 +76,13 @@ class SearchEngine(Search_api):
         # Highlight
         s = s.highlight_fields()
 
-        # Sort
-        s = s.sort(
-            {"_score": {"order": "desc"}},
-            {fields.releaseDate.name: {"order": "desc"}}
-        )
+        if "sort_by" in kwargs:
+            # Sort
+            sort_by = kwargs.pop("sort_by")
+            assert isinstance(sort_by, SortFields), "sort_by must be instance of SortFields"
+            s = s.sort(
+                query_sort(sort_by)
+            )
         return s
 
     def type_counts_query(self, search_term):

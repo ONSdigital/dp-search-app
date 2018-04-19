@@ -2,7 +2,8 @@ from flask import render_template
 from flask import current_app as app
 
 from . import search, ons_search_engine, hits_to_json, aggs_to_json
-from paginator import Paginator, MAX_VISIBLE_PAGINATOR_LINK, RESULTS_PER_PAGE
+from paginator import Paginator, MAX_VISIBLE_PAGINATOR_LINK
+from sort_by import SortFields
 
 from ..app import get_request_param, get_form_param
 
@@ -69,9 +70,22 @@ def content_query():
     """
     API for executing a standard ONS query
     """
+    import time
+
+    start = time.time()
     # Get query term from request
     search_term = get_request_param("q", True)
+
+    # Get any content type filters
     type_filters = get_form_param("filter", False, None)
 
+    # Get sort_by. Default to relevance
+    sort_by_str = get_form_param("sort_by", False, "relevance")
+    sort_by = SortFields[sort_by_str]
+
     # Execute the search
-    return execute_search(search_term, type_filters=type_filters)
+    response = execute_search(search_term, type_filters=type_filters, sort_by=sort_by)
+    end = time.time()
+    with app.app_context():
+        app.logger.info("Search query took %1.2f ms" % (end - start))
+    return response
