@@ -70,14 +70,5 @@ def content_query():
     search_term = get_request_param("q", True)
     type_filters = get_form_param("filter", False, None)
 
-    print "typeFilters = ", type_filters
-
-    # # Build any must/should/must_not clauses
-    # kwargs = {
-    #     "must": request.form.get("must", "").split(),
-    #     "should": request.form.get("should", "").split(),
-    #     "must_not": request.form.get("must_not", "").split()
-    # }
-
     # Execute the search
     return execute_search(search_term, type_filters=type_filters)
