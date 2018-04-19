@@ -43,16 +43,17 @@ def marshall_hits(hits):
         hit_dict = hit.to_dict()
         if hasattr(hit.meta, "highlight") and fields.title.name in hit.meta.highlight:
             for fragment in hit.meta.highlight[fields.title.name]:
+                fragment = fragment.strip()
                 if fragment.startswith("<strong>"):
                     highlighted_text = fragment.replace("<strong>", "").replace("</strong>", "")
 
                     hit_dict["description"]["title"] = hit_dict["description"]["title"].replace(
                         highlighted_text,
-                        fragment)
+                        "<strong>%s</strong>" % highlighted_text)
 
                     hit_dict["description"]["title"] = hit_dict["description"]["title"].replace(
                         highlighted_text.lower(),
-                        fragment.lower())
+                        "<strong>%s</strong>" % highlighted_text.lower())
 
         hit_dict["_type"] = hit_dict.pop("type")  # rename 'type' field to '_type'
         hits_list.append(hit_dict)

@@ -41,7 +41,6 @@ def execute_search(search_term, **kwargs):
     page_number = int(get_form_param("page", False, 1))
     page_size = int(get_form_param("size", False, 10))
 
-    print "Page number/size:", page_number, page_size
     paginator = Paginator(total_hits, MAX_VISIBLE_PAGINATOR_LINK, page_number, page_size)
 
     # Perform the query
