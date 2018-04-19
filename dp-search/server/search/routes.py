@@ -39,7 +39,8 @@ def execute_search(search_term, **kwargs):
     aggregations, total_hits = aggs_to_json(type_counts_response.aggregations, "docCounts")
 
     page_number = int(get_request_param("page", False, 1))
-    paginator = Paginator(total_hits, MAX_VISIBLE_PAGINATOR_LINK, page_number, RESULTS_PER_PAGE)
+    page_size = int(get_request_param("size", False, 10))
+    paginator = Paginator(total_hits, MAX_VISIBLE_PAGINATOR_LINK, page_number, page_size)
 
     # Perform the query
     content_response = ons_search_engine().content_query(search_term, paginator, **kwargs).execute()
