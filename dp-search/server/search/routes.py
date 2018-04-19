@@ -35,7 +35,9 @@ def execute_search(search_term, **kwargs):
     TODO - Replace below with MultiSearch
     """
 
-    type_counts_response = ons_search_engine().type_counts_query(search_term, **kwargs).execute()
+    s = ons_search_engine().type_counts_query(search_term)
+    type_counts_response = s.execute()
+
     aggregations, total_hits = aggs_to_json(type_counts_response.aggregations, "docCounts")
 
     page_number = int(get_form_param("page", False, 1))
@@ -44,11 +46,13 @@ def execute_search(search_term, **kwargs):
     paginator = Paginator(total_hits, MAX_VISIBLE_PAGINATOR_LINK, page_number, page_size)
 
     # Perform the query
-    content_response = ons_search_engine().content_query(search_term, paginator, **kwargs).execute()
+    s = ons_search_engine().content_query(search_term, paginator, **kwargs)
+    content_response = s.execute()
 
     featured_result_response = None
     if paginator.current_page <= 1:
-        featured_result_response = ons_search_engine().featured_result_query(search_term).execute()
+        s = ons_search_engine().featured_result_query(search_term)
+        featured_result_response = s.execute()
 
     # Return the hits as JSON
     return hits_to_json(content_response, aggregations, total_hits, paginator, featured_result_response=featured_result_response)

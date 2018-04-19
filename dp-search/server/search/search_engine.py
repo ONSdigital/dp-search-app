@@ -34,9 +34,12 @@ class SearchEngine(Search_api):
         super(SearchEngine, self).__init__(**kwargs)
         self.info = self._using.info()
 
-    def highlight_title(self):
+    def highlight_fields(self):
         s = self._clone()
-        s = s.highlight(fields.title.name, fragment_size=0, pre_tags=["<strong>"], post_tags=["</strong>"])
+
+        for field in fields.field_list:
+            if field.highlight:
+                s = s.highlight(field.name, fragment_size=0, pre_tags=["<strong>"], post_tags=["</strong>"])
         return s
 
     def content_query(self, search_term, paginator=None, **kwargs):
@@ -69,7 +72,7 @@ class SearchEngine(Search_api):
             s = s.filter("terms", type=type_filters)
 
         # Highlight
-        s = s.highlight_title()
+        s = s.highlight_fields()
 
         # Sort
         s = s.sort(
@@ -78,17 +81,16 @@ class SearchEngine(Search_api):
         )
         return s
 
-    def type_counts_query(self, search_term, **kwargs):
+    def type_counts_query(self, search_term):
         """
         TODO - Fix bug where docCounts does not match number of items returned by filter
         :param search_term:
-        :param kwargs:
         :return:
         """
         type_filters = all_filter_funcs()
         return self.content_query(search_term, type_filters=type_filters)
 
-    def featured_result_query(self, search_term, **kwargs):
+    def featured_result_query(self, search_term):
         s = self._clone()
         dis_max = content_query(search_term)
         query = {
@@ -101,7 +103,7 @@ class SearchEngine(Search_api):
         # Add filters
         s = s.filter("terms", type=["product_page", "home_page_census"])
         # Add highlights
-        s = s.highlight_title()
+        s = s.highlight_fields()
         return s
 
 

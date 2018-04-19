@@ -1,7 +1,10 @@
-from flask import Blueprint, jsonify
-from .search_engine import get_search_engine
 import os
+
+from flask import Blueprint, jsonify
+
 import fields
+from .search_engine import get_search_engine
+from hit import Hit
 
 # Create the search blueprint
 search = Blueprint("search", __name__)
@@ -32,6 +35,14 @@ def aggs_to_json(aggregations, key):
     return {}
 
 
+def get_var(input_dict, accessor_string):
+    """Gets data from a dictionary using a dotted accessor-string"""
+    current_data = input_dict
+    for chunk in accessor_string.split('.'):
+        current_data = current_data.get(chunk, {})
+    return current_data
+
+
 def marshall_hits(hits):
     """
     Substitues highlights into fields and returns valid JSON
@@ -40,20 +51,25 @@ def marshall_hits(hits):
     """
     hits_list = []
     for hit in hits:
-        hit_dict = hit.to_dict()
-        if hasattr(hit.meta, "highlight") and fields.title.name in hit.meta.highlight:
-            for fragment in hit.meta.highlight[fields.title.name]:
-                fragment = fragment.strip()
-                if fragment.startswith("<strong>"):
-                    highlighted_text = fragment.replace("<strong>", "").replace("</strong>", "")
+        hit_dict = Hit(hit.to_dict())
+        if hasattr(hit.meta, "highlight"):
+            for field in fields.field_list:
+                if field.highlight and field.name in hit.meta.highlight:
+                    for fragment in hit.meta.highlight[field.name]:
+                        fragment = fragment.strip()
+                        if fragment.startswith("<strong>"):
+                            highlighted_text = fragment.replace("<strong>", "").replace("</strong>", "")
 
-                    hit_dict["description"]["title"] = hit_dict["description"]["title"].replace(
-                        highlighted_text,
-                        "<strong>%s</strong>" % highlighted_text)
+                            val = get_var(hit_dict, field.name)
 
-                    hit_dict["description"]["title"] = hit_dict["description"]["title"].replace(
-                        highlighted_text.lower(),
-                        "<strong>%s</strong>" % highlighted_text.lower())
+                            val = val.replace(
+                                highlighted_text,
+                                "<strong>%s</strong>" % highlighted_text)
+
+                            val = val.replace(
+                                highlighted_text.lower(),
+                                "<strong>%s</strong>" % highlighted_text.lower())
+                            hit_dict.set_value(field.name, val)
 
         hit_dict["_type"] = hit_dict.pop("type")  # rename 'type' field to '_type'
         hits_list.append(hit_dict)
@@ -98,4 +114,4 @@ def hits_to_json(content_response, aggregations, total_hits, paginator, featured
 
 
 # Import the routes (this should be done last here)
-from . import routes
+from routes import *
