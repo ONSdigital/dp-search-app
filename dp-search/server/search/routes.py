@@ -4,7 +4,7 @@ from flask import current_app as app
 from . import search, ons_search_engine, hits_to_json, aggs_to_json
 from paginator import Paginator, MAX_VISIBLE_PAGINATOR_LINK, RESULTS_PER_PAGE
 
-from ..app import get_request_param
+from ..app import get_request_param, get_form_param
 
 from flasgger import swag_from
 
@@ -38,8 +38,10 @@ def execute_search(search_term, **kwargs):
     type_counts_response = ons_search_engine().type_counts_query(search_term, **kwargs).execute()
     aggregations, total_hits = aggs_to_json(type_counts_response.aggregations, "docCounts")
 
-    page_number = int(get_request_param("page", False, 1))
-    page_size = int(get_request_param("size", False, 10))
+    page_number = int(get_form_param("page", False, 1))
+    page_size = int(get_form_param("size", False, 10))
+
+    print "Page number/size:", page_number, page_size
     paginator = Paginator(total_hits, MAX_VISIBLE_PAGINATOR_LINK, page_number, page_size)
 
     # Perform the query
@@ -66,7 +68,9 @@ def content_query():
     """
     # Get query term from request
     search_term = get_request_param("q", True)
-    type_filters = get_request_param("filter", False, None)
+    type_filters = get_form_param("filter", False, None)
+
+    print "typeFilters = ", type_filters
 
     # # Build any must/should/must_not clauses
     # kwargs = {
