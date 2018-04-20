@@ -12,7 +12,7 @@ class Field(object):
 
     @property
     def field_name_boosted(self):
-        return "%s^%1.2f" % (self.name, self.boost) if self.boost is not None else self.name
+        return "%s^%d" % (self.name, int(self.boost)) if self.boost is not None else self.name
 
 
 uri = Field("uri")

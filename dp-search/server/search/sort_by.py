@@ -43,8 +43,10 @@ sort_by = {
 def query_sort(sort_field):
     from collections import OrderedDict
     assert isinstance(sort_field, SortFields), "sort_field must be instance of SortFields enum"
-    d = OrderedDict()
+    s = []
 
     for field, order in sort_by[sort_field]:
+        d = OrderedDict()
         d[field.name] = {"order": order.value}
-    return d
+        s.append(d)
+    return s

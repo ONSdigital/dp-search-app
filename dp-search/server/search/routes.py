@@ -47,7 +47,7 @@ def execute_search(search_term, **kwargs):
     paginator = Paginator(total_hits, MAX_VISIBLE_PAGINATOR_LINK, page_number, page_size)
 
     # Perform the query
-    s = ons_search_engine().content_query(search_term, paginator, **kwargs)
+    s = ons_search_engine().content_query(search_term, paginator=paginator, **kwargs)
     content_response = s.execute()
 
     featured_result_response = None
