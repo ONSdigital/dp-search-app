@@ -23,7 +23,8 @@ def keywords():
         top_n = int(top_n)
     else:
         from ..exceptions.requests import BadRequest
-        raise BadRequest("count specified but is not a number in route '/suggest/keywords'")
+        raise BadRequest(
+            "count specified but is not a number in route '/suggest/keywords'")
 
     supervised_model = load_supervised_model(SupervisedModels.ONS)
     kws = supervised_model.keywords(query, top_n=top_n)

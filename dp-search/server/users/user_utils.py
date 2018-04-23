@@ -54,7 +54,10 @@ class SessionUtils():
         assert isinstance(user, User), "Must supply instance of User"
 
         dim = model.f.get_dimension()
-        return Session(user_id=user.id, session_id=session_id, session_vector=zeros(dim))
+        return Session(
+            user_id=user.id,
+            session_id=session_id,
+            session_vector=zeros(dim))
 
     @staticmethod
     def get_current_session_id():
@@ -70,7 +73,10 @@ class SessionUtils():
         assert isinstance(user, User), "Must supply instance of User"
 
         if session_id:
-            return len(Session.objects(user_id=user.id, session_id=session_id)) > 0
+            return len(
+                Session.objects(
+                    user_id=user.id,
+                    session_id=session_id)) > 0
         return False
 
     @staticmethod
@@ -102,7 +108,8 @@ class SessionUtils():
         session_id = SessionUtils.get_current_session_id()
         if session_id:
             if SessionUtils.session_exits(user, session_id):
-                return Session.objects.get(user_id=user.id, session_id=session_id)
+                return Session.objects.get(
+                    user_id=user.id, session_id=session_id)
             else:
                 session = SessionUtils.create_session(user, session_id)
                 session.save()

@@ -1,12 +1,14 @@
-import os, json
+import os
+import json
+
 
 class FileScanner(object):
     def __init__(self, zebedee_root=None):
-        if (zebedee_root == None):
+        if (zebedee_root is None):
             zebedee_root = os.getenv("zebedee_root")
         self.zebedee_root = zebedee_root
 
-        if (self.zebedee_root == None):
+        if (self.zebedee_root is None):
             raise ValueError("zebedee_root cannot be None")
 
     def scan(self):

@@ -9,11 +9,20 @@ class Paginator(object):
     """
     Paginator class - replicates pagination functionality from babbage
     """
-    def __init__(self, number_of_results, max_visible_links, current_page, result_per_page):
+
+    def __init__(
+            self,
+            number_of_results,
+            max_visible_links,
+            current_page,
+            result_per_page):
         self.current_page = current_page
-        self.number_of_pages = Paginator.calculate_number_of_pages(number_of_results, result_per_page)
-        self.end = Paginator.calculate_end(self.number_of_pages, current_page, max_visible_links)
-        self.start = Paginator.calculate_start(self.number_of_pages, max_visible_links, self.end)
+        self.number_of_pages = Paginator.calculate_number_of_pages(
+            number_of_results, result_per_page)
+        self.end = Paginator.calculate_end(
+            self.number_of_pages, current_page, max_visible_links)
+        self.start = Paginator.calculate_start(
+            self.number_of_pages, max_visible_links, self.end)
         self.pages = self.get_page_list()
         self.size = int(result_per_page)
 
@@ -38,7 +47,10 @@ class Paginator(object):
 
     @staticmethod
     def calculate_number_of_pages(number_of_results, results_per_page):
-        return int(math.ceil(float(number_of_results) / float(results_per_page)))
+        return int(
+            math.ceil(
+                float(number_of_results) /
+                float(results_per_page)))
 
     def get_page_list(self):
         page_list = range(self.start, self.end + 1)

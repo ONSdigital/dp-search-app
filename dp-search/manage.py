@@ -19,9 +19,15 @@ def run_tests():
         from subprocess import check_output
 
         os.environ['FLASK_CONFIG'] = 'testing'
-        print check_output(['nosetests', '-v', '-s',
-                            '--with-coverage', '--cover-package=server', '--cover-branches',
-                            '--cover-erase', '--cover-html', '--cover-html-dir=cover'])
+        print check_output(['nosetests',
+                            '-v',
+                            '-s',
+                            '--with-coverage',
+                            '--cover-package=server',
+                            '--cover-branches',
+                            '--cover-erase',
+                            '--cover-html',
+                            '--cover-html-dir=cover'])
 
     # Run the test
     test()

@@ -17,7 +17,8 @@ def init(app):
     model_dir = app.config["VECTOR_MODELS_DIR"]
     for model in WordVectorModels:
         fname = "%s/%s" % (model_dir, model.value)
-        _models[model] = gensim.models.KeyedVectors.load_word2vec_format(fname, binary=fname.endswith(".bin"))
+        _models[model] = gensim.models.KeyedVectors.load_word2vec_format(
+            fname, binary=fname.endswith(".bin"))
 
     # Safe to init spelling models
     init_spelling_models()

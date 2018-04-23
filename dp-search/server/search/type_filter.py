@@ -3,7 +3,8 @@ from content_types import *
 
 class TypeFilter(object):
     def __init__(self, content_types):
-        assert hasattr(content_types, "__iter__"), "content_types must be instance of iterable"
+        assert hasattr(
+            content_types, "__iter__"), "content_types must be instance of iterable"
         self.content_types = content_types
 
 
@@ -15,9 +16,12 @@ time_series_type_filter = TypeFilter([timeseries])
 datasets_type_filter = TypeFilter([dataset_landing_page, reference_tables])
 user_requested_data_type_filter = TypeFilter([static_adhoc])
 qmi_type_filter = TypeFilter([static_qmi])
-methodology_type_filter = TypeFilter([static_qmi, static_methodology, static_methodology_download])
-methodology_article_type_filter = TypeFilter([static_methodology, static_methodology_download])
-corporate_information_type_filter = TypeFilter([static_foi, static_page, static_landing_page, static_article])
+methodology_type_filter = TypeFilter(
+    [static_qmi, static_methodology, static_methodology_download])
+methodology_article_type_filter = TypeFilter(
+    [static_methodology, static_methodology_download])
+corporate_information_type_filter = TypeFilter(
+    [static_foi, static_page, static_landing_page, static_article])
 
 filters = {
     "_all": [

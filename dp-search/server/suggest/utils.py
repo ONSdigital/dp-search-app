@@ -8,7 +8,8 @@ def cosine_sim(vec1, vec2):
     :param vec2:
     :return:
     """
-    cos_sim = np.dot(vec1, vec2) / (np.linalg.norm(vec1) * np.linalg.norm(vec2))
+    cos_sim = np.dot(vec1, vec2) / \
+        (np.linalg.norm(vec1) * np.linalg.norm(vec2))
     return cos_sim
 
 
@@ -20,5 +21,6 @@ def cosine_sim_matrix(matrix, vec):
     :return:
     """
     # cos_sim is array like
-    cos_sim = np.dot(matrix, vec) / (np.linalg.norm(matrix, axis=1) * np.linalg.norm(vec))
+    cos_sim = np.dot(matrix, vec) / \
+        (np.linalg.norm(matrix, axis=1) * np.linalg.norm(vec))
     return cos_sim

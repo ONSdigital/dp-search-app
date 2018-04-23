@@ -39,7 +39,8 @@ class Suggestions(object):
             yield item
 
     def __contains__(self, item):
-        assert isinstance(item, Suggestion), "item must be an instance of 'Suggestion'"
+        assert isinstance(
+            item, Suggestion), "item must be an instance of 'Suggestion'"
         for suggestion in self:
             if suggestion.suggestion == item.suggestion:
                 return True
@@ -55,19 +56,24 @@ class Suggestions(object):
         }
 
     def append(self, item):
-        assert isinstance(item, Suggestion), "item must be an instance of 'Suggestion'"
+        assert isinstance(
+            item, Suggestion), "item must be an instance of 'Suggestion'"
         self._suggestions.append(item)
         return self
 
     def extend(self, items):
         assert len(items) > 0, "Must supply non-empty list"
-        assert isinstance(items[0], Suggestion), "item must be an instance of 'Suggestion'"
+        assert isinstance(
+            items[0], Suggestion), "item must be an instance of 'Suggestion'"
         self._suggestions.extend(items)
         return self
 
     @property
     def suggestions(self):
-        return sorted(self._suggestions, key=lambda item: item.confidence, reverse=True)
+        return sorted(
+            self._suggestions,
+            key=lambda item: item.confidence,
+            reverse=True)
 
 
 class SuggestEngine(object):
@@ -85,7 +91,9 @@ class SuggestEngine(object):
         s = ons_search_engine()
         for i, token in enumerate(tokens):
             name = "suggest_%d" % i
-            s = s.suggest(name, token, phrase={"field": fields.suggestion_field.name})
+            s = s.suggest(
+                name, token, phrase={
+                    "field": fields.suggestion_field.name})
         result = s.execute_suggest()
 
         # Build list of suggestions
@@ -158,7 +166,8 @@ class SuggestEngine(object):
                 return str(self.to_dict())
 
             def __eq__(self, other):
-                return isinstance(other, SimilarWord) and other.word == self.word
+                return isinstance(
+                    other, SimilarWord) and other.word == self.word
 
             def to_dict(self):
                 return self.__json__()
@@ -175,7 +184,8 @@ class SuggestEngine(object):
             vec_model = load_model(model)
 
             for token in tokens:
-                similar_to_token = vec_model.similar_by_word(token, topn=topn * 2)
+                similar_to_token = vec_model.similar_by_word(
+                    token, topn=topn * 2)
                 if len(similar_to_token) > 0:
                     if token not in similar:
                         similar[token] = set()
@@ -186,7 +196,10 @@ class SuggestEngine(object):
 
         # Sort by scores across models and only keep topn
         for token in similar:
-            sorted_list = sorted(similar[token], key=lambda x: x.score, reverse=True)
+            sorted_list = sorted(
+                similar[token],
+                key=lambda x: x.score,
+                reverse=True)
             similar[token] = sorted_list[:topn]
 
         return similar

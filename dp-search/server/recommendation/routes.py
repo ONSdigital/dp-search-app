@@ -42,5 +42,4 @@ def recommendations_by_id():
     from flask import request
 
     user_id = request.form.get("user_id", "").strip()
-    print "User id = ", user_id
     return get_user_recommendations(user_id)

@@ -9,9 +9,12 @@ _models = {}
 class SupervisedModels(enum.Enum):
     ONS = "ons_supervised.bin"
 
+
 """
 TODO - Label clustering to reduce memory footprint
 """
+
+
 class SupervisedModel(object):
     def __init__(self, model, supervised_model, prefix="__label__"):
         assert isinstance(model, SupervisedModels)
@@ -22,10 +25,12 @@ class SupervisedModel(object):
 
         # Normalised vectors
         # self.input_matrix_normalised = self._normalise_matrix(self.f.get_input_matrix())
-        self.output_matrix_normalised = self._normalise_matrix(self.f.get_output_matrix())
+        self.output_matrix_normalised = self._normalise_matrix(
+            self.f.get_output_matrix())
 
         # Labels
-        self.labels = np.array([l.replace(self.prefix, "") for l in self.f.get_labels()])
+        self.labels = np.array([l.replace(self.prefix, "")
+                                for l in self.f.get_labels()])
 
     @staticmethod
     def _normalise_matrix(matrix):
@@ -103,7 +108,8 @@ class SupervisedModel(object):
         :param vector:
         :return:
         """
-        cosine_similarity = cosine_sim_matrix(self.output_matrix_normalised, vector)
+        cosine_similarity = cosine_sim_matrix(
+            self.output_matrix_normalised, vector)
         ind = np.argsort(-cosine_similarity)
 
         return self._get_top_n(self.labels, cosine_similarity, ind, top_n)
@@ -112,7 +118,10 @@ class SupervisedModel(object):
         labels, proba = self.f.predict(text, top_n)
 
         # Clean up labels
-        labels = [label.replace(self.prefix, "") if self.prefix in label else label for label in labels]
+        labels = [
+            label.replace(
+                self.prefix,
+                "") if self.prefix in label else label for label in labels]
 
         result = [{"label": label, "P": P} for label, P in zip(labels, proba)]
 

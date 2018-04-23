@@ -22,19 +22,22 @@ class User(db.Document):
         """
         from user_utils import SessionUtils
         # Sort sessions in descending order and limit to 10 items
-        sessions = SessionUtils.get_sessions_for_user(self).order_by("-id").limit(10)
+        sessions = SessionUtils.get_sessions_for_user(
+            self).order_by("-id").limit(10)
 
         if len(sessions) > 0:
             # Compute vector weights which decay exponentially over time
             count = len(sessions)
             # Last weight is normalised to 1.0
-            weights = np.array([np.exp(c) for c in range(count)]) / np.exp(count - 1)
+            weights = np.array([np.exp(c)
+                                for c in range(count)]) / np.exp(count - 1)
 
             # Reverse the weights to match session ordering
             weights = weights[::-1]
 
             # Combine vectors and weights
-            vectors = np.array([s.session_array * w for s, w in zip(sessions, weights)])
+            vectors = np.array(
+                [s.session_array * w for s, w in zip(sessions, weights)])
 
             # Average
             user_vec = np.mean(vectors, axis=0)

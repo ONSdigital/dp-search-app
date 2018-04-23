@@ -27,7 +27,8 @@ class SpellChecker(object):
         # returns 0 if the word isn't in the dictionary
         if word not in self.words:
             return 0.
-        return float(len(self.words)) / (float(self.words.get(word, 0)) + float(len(self.words)))
+        return float(len(self.words)) / \
+            (float(self.words.get(word, 0)) + float(len(self.words)))
 
     def correction(self, word):
         """ Most probable spelling correction for word. """
@@ -35,7 +36,10 @@ class SpellChecker(object):
 
     def candidates(self, word):
         """ Generate possible spelling corrections for word. """
-        return self.known([word]) or self.known(self.edits1(word)) or self.known(self.edits2(word)) or [word]
+        return self.known(
+            [word]) or self.known(
+            self.edits1(word)) or self.known(
+            self.edits2(word)) or [word]
 
     def known(self, words):
         """ The subset of `words` that appear in the dictionary of WORDS. """
@@ -68,8 +72,7 @@ def init():
 
 def load_spelling_model(model):
     from word2vec_models import WordVectorModels
-    
+
     if not isinstance(model, WordVectorModels):
         raise ValueError("Must be instance of Models enum")
     return _models[model]
-

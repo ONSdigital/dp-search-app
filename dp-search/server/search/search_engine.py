@@ -41,30 +41,43 @@ class SearchEngine(Search_api):
 
         field_names = [field.name for field in fields.highlight_fields]
 
-        s = s.highlight(*field_names, fragment_size=0, pre_tags=["<strong>"], post_tags=["</strong>"])
+        s = s.highlight(
+            *field_names,
+            fragment_size=0,
+            pre_tags=["<strong>"],
+            post_tags=["</strong>"])
 
         return s
 
-    def content_query(self, search_term, paginator=None, do_aggregations=False, **kwargs):
+    def content_query(
+            self,
+            search_term,
+            paginator=None,
+            do_aggregations=False,
+            **kwargs):
         s = self._clone()
 
-        function_scores = kwargs.pop("function_scores", content_filter_functions())
+        function_scores = kwargs.pop(
+            "function_scores", content_filter_functions())
         type_filters = kwargs.pop("type_filters", None)
 
         if paginator is not None:
-            from_start = 0 if paginator.current_page <= 1 else (paginator.current_page - 1) * paginator.size
+            from_start = 0 if paginator.current_page <= 1 else (
+                paginator.current_page - 1) * paginator.size
 
             query = {
                 "from": from_start,
                 "size": paginator.size,
-                "query": content_query(search_term, function_scores=function_scores).to_dict()
-            }
+                "query": content_query(
+                    search_term,
+                    function_scores=function_scores).to_dict()}
             if do_aggregations:
                 query["aggs"] = type_counts_query()
         else:
             query = {
-                "query": content_query(search_term, function_scores=function_scores).to_dict()
-            }
+                "query": content_query(
+                    search_term,
+                    function_scores=function_scores).to_dict()}
             if do_aggregations:
                 query["aggs"] = type_counts_query()
 
@@ -82,7 +95,8 @@ class SearchEngine(Search_api):
         if "sort_by" in kwargs:
             # Sort
             sort_by = kwargs.pop("sort_by")
-            assert isinstance(sort_by, SortFields), "sort_by must be instance of SortFields"
+            assert isinstance(
+                sort_by, SortFields), "sort_by must be instance of SortFields"
             s = s.sort(
                 *query_sort(sort_by)
             )
@@ -99,7 +113,10 @@ class SearchEngine(Search_api):
         :return:
         """
         type_filters = all_filter_funcs()
-        return self.content_query(search_term, do_aggregations=True, type_filters=type_filters)
+        return self.content_query(
+            search_term,
+            do_aggregations=True,
+            type_filters=type_filters)
 
     def featured_result_query(self, search_term):
         s = self._clone()

@@ -24,11 +24,15 @@ def execute_search(search_term, **kwargs):
                 session = SessionUtils.get_current_session(user)
                 if session is not None:
                     with app.app_context():
-                        app.logger.info("Updating session vector: %s:%s" % (user.user_id, session.session_id))
+                        app.logger.info(
+                            "Updating session vector: %s:%s" %
+                            (user.user_id, session.session_id))
                     session.update_session_vector(search_term)
         except Exception as e:
             with app.app_context():
-                app.logger.error("Unable to update user '%s:%s'" % (user.id, user.user_id))
+                app.logger.error(
+                    "Unable to update user '%s:%s'" %
+                    (user.id, user.user_id))
                 app.logger.exception(str(e))
 
     # Perform the search
@@ -39,15 +43,21 @@ def execute_search(search_term, **kwargs):
     s = ons_search_engine().type_counts_query(search_term)
     type_counts_response = s.execute()
 
-    aggregations, total_hits = aggs_to_json(type_counts_response.aggregations, "docCounts")
+    aggregations, total_hits = aggs_to_json(
+        type_counts_response.aggregations, "docCounts")
 
     page_number = int(get_form_param("page", False, 1))
     page_size = int(get_form_param("size", False, 10))
 
-    paginator = Paginator(total_hits, MAX_VISIBLE_PAGINATOR_LINK, page_number, page_size)
+    paginator = Paginator(
+        total_hits,
+        MAX_VISIBLE_PAGINATOR_LINK,
+        page_number,
+        page_size)
 
     # Perform the query
-    s = ons_search_engine().content_query(search_term, paginator=paginator, **kwargs)
+    s = ons_search_engine().content_query(
+        search_term, paginator=paginator, **kwargs)
     content_response = s.execute()
 
     featured_result_response = None
@@ -56,7 +66,11 @@ def execute_search(search_term, **kwargs):
         featured_result_response = s.execute()
 
     # Return the hits as JSON
-    return hits_to_json(content_response, aggregations, paginator, featured_result_response=featured_result_response)
+    return hits_to_json(
+        content_response,
+        aggregations,
+        paginator,
+        featured_result_response=featured_result_response)
 
 
 @search.route("/")
@@ -84,7 +98,10 @@ def content_query():
     sort_by = SortFields[sort_by_str]
 
     # Execute the search
-    response = execute_search(search_term, type_filters=type_filters, sort_by=sort_by)
+    response = execute_search(
+        search_term,
+        type_filters=type_filters,
+        sort_by=sort_by)
     end = time.time()
     with app.app_context():
         app.logger.info("Search query took %1.2f ms" % (end - start))

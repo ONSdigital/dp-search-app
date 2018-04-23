@@ -17,7 +17,8 @@ def _get_param(key, required, args, generator, default):
             else:
                 return values
     if required:
-        message = "Invalid value for required argument '%s' and route '%s'" % (key, request.url)
+        message = "Invalid value for required argument '%s' and route '%s'" % (
+            key, request.url)
         # Will be automatically caught by handle_exception and return a 400
         raise BadRequest(message)
     else:
@@ -33,11 +34,21 @@ def get_request_param(key, required, default=None):
     :return: value
     :raises ValueError: key not found or value is None
     """
-    return _get_param(key, required, request.args, request.args.getlist, default)
+    return _get_param(
+        key,
+        required,
+        request.args,
+        request.args.getlist,
+        default)
 
 
 def get_form_param(key, required, default=None):
-    value = _get_param(key, required, request.form, request.form.getlist, default)
+    value = _get_param(
+        key,
+        required,
+        request.form,
+        request.form.getlist,
+        default)
     return value
 
 
@@ -50,7 +61,10 @@ def create_app():
     config_name = os.environ.get('FLASK_CONFIG', 'development')
 
     # Initialise the app from the config
-    app = Flask(__name__, template_folder="../web/templates", static_folder="../web/static")
+    app = Flask(
+        __name__,
+        template_folder="../web/templates",
+        static_folder="../web/static")
     app.config.from_object('config_' + config_name)
 
     # Set custom JSONEncoder
@@ -83,7 +97,9 @@ def create_app():
 
         app.register_blueprint(suggest_blueprint, url_prefix="/suggest")
         app.register_blueprint(nlp_blueprint, url_prefix="/nlp")
-        app.register_blueprint(recommendation_blueprint, url_prefix="/recommend")
+        app.register_blueprint(
+            recommendation_blueprint,
+            url_prefix="/recommend")
 
         # Init suggest models using app config
         from suggest import word2vec_models, supervised_models
@@ -127,7 +143,8 @@ def create_app():
                             response.status)
         return response
 
-    # Declare function to log all uncaught exceptions and return a 500 with info
+    # Declare function to log all uncaught exceptions and return a 500 with
+    # info
     @app.errorhandler(Exception)
     def handle_exception(exception):
         """ Define a custom error handler that guarantees exceptions are always logged. """
@@ -144,7 +161,10 @@ def create_app():
         }
         # Jsonify the exception and return a error response
         response = jsonify(err)
-        if hasattr(exception, "status_code") and is_number(exception.status_code):
+        if hasattr(
+                exception,
+                "status_code") and is_number(
+                exception.status_code):
             response.status_code = int(exception.status_code)
         else:
             response.status_code = 500

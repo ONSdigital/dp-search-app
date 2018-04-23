@@ -25,9 +25,10 @@ class RecommendationEngine(object):
         assert isinstance(user, User), "Must supply instance of user"
         user_vector = user.get_user_vector()
         if user_vector is not None and len(user_vector) > 0:
-            top_labels, similarity = self.model.get_labels_for_vector(user_vector, top_n)
-            result = sorted([{"keyword": k, "similarity": s} for k, s in zip(top_labels, similarity)],
-                            key=lambda x: x["similarity"], reverse=True)
+            top_labels, similarity = self.model.get_labels_for_vector(
+                user_vector, top_n)
+            result = sorted([{"keyword": k, "similarity": s} for k, s in zip(
+                top_labels, similarity)], key=lambda x: x["similarity"], reverse=True)
 
             return result
         return []

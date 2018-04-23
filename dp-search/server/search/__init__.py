@@ -71,24 +71,33 @@ def marshall_hits(hits):
                 for fragment in highlight_dict[highlight_key]:
                     fragment = fragment.strip()
                     if "<strong>" in fragment and "</strong>" in fragment:
-                        highlighted_text = " ".join(re.findall("<strong>(.*?)</strong>", fragment))
+                        highlighted_text = " ".join(re.findall(
+                            "<strong>(.*?)</strong>", fragment))
 
                         val = get_var(hit_dict, highlight_key)
 
                         if hasattr(val, "__iter__"):
                             highlighted_vals = []
                             for v in val:
-                                highlighted_vals.append(_highlight(highlighted_text, v))
+                                highlighted_vals.append(
+                                    _highlight(highlighted_text, v))
                             hit_dict.set_value(highlight_key, highlighted_vals)
                         else:
-                            hit_dict.set_value(highlight_key, _highlight(highlighted_text, val))
+                            hit_dict.set_value(
+                                highlight_key, _highlight(
+                                    highlighted_text, val))
 
-        hit_dict["_type"] = hit_dict.pop("type")  # rename 'type' field to '_type'
+        # rename 'type' field to '_type'
+        hit_dict["_type"] = hit_dict.pop("type")
         hits_list.append(hit_dict)
     return hits_list
 
 
-def hits_to_json(content_response, aggregations, paginator, featured_result_response=None):
+def hits_to_json(
+        content_response,
+        aggregations,
+        paginator,
+        featured_result_response=None):
     """
     Replicates the JSON response of Babbage
     :param content_response:
@@ -100,7 +109,8 @@ def hits_to_json(content_response, aggregations, paginator, featured_result_resp
 
     featured_result_hits = []
     if featured_result_response is not None:
-        featured_result_hits = [h.to_dict() for h in featured_result_response.hits]
+        featured_result_hits = [h.to_dict()
+                                for h in featured_result_response.hits]
 
     response = {
         "result": {
