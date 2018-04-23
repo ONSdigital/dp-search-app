@@ -97,13 +97,15 @@ def hits_to_json(
         content_response,
         aggregations,
         paginator,
+        sort_by,
         featured_result_response=None):
     """
     Replicates the JSON response of Babbage
     :param content_response:
-    :param type_counts_response:
+    :param aggregations:
+    :param paginator:
+    :param sort_by:
     :param featured_result_response:
-    :param page_number:
     :return:
     """
 
@@ -119,7 +121,8 @@ def hits_to_json(
             "results": marshall_hits(content_response.hits),
             "suggestions": [],
             "docCounts": {},
-            "paginator": paginator
+            "paginator": paginator,
+            "sortBy": sort_by
 
         },
         "counts": {

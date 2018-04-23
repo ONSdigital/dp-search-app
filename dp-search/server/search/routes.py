@@ -10,7 +10,7 @@ from ..app import get_request_param, get_form_param
 from flasgger import swag_from
 
 
-def execute_search(search_term, **kwargs):
+def execute_search(search_term, sort_by, **kwargs):
     """
     Simple search API to query Elasticsearch
     """
@@ -57,7 +57,7 @@ def execute_search(search_term, **kwargs):
 
     # Perform the query
     s = ons_search_engine().content_query(
-        search_term, paginator=paginator, **kwargs)
+        search_term, sort_by=sort_by, paginator=paginator, **kwargs)
     content_response = s.execute()
 
     featured_result_response = None
@@ -70,6 +70,7 @@ def execute_search(search_term, **kwargs):
         content_response,
         aggregations,
         paginator,
+        sort_by.name,
         featured_result_response=featured_result_response)
 
 
@@ -100,8 +101,8 @@ def content_query():
     # Execute the search
     response = execute_search(
         search_term,
-        type_filters=type_filters,
-        sort_by=sort_by)
+        sort_by,
+        type_filters=type_filters)
     end = time.time()
     with app.app_context():
         app.logger.info("Search query took %1.2f ms" % (end - start))

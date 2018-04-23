@@ -89,6 +89,10 @@ def create_app():
     # Register blueprints
     app.register_blueprint(search_blueprint, url_prefix="/search")
 
+    # Search only?
+    search_only = bool(os.environ.get('SEARCH_ONLY', 'False'))
+    app.config["SEARCH_ONLY"] = search_only
+
     if app.config["SEARCH_ONLY"] is False:
         app.logger.info("Initialising additional endpoints")
         from .suggest import suggest as suggest_blueprint
