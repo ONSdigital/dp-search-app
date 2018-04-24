@@ -8,6 +8,11 @@ from flask import request, redirect, jsonify
 from exceptions.requests import BadRequest
 
 
+COMPRESS_MIMETYPES = ['text/html', 'text/css', 'text/xml', 'application/json', 'application/javascript']
+COMPRESS_LEVEL = 6
+COMPRESS_MIN_SIZE = 500
+
+
 def _get_param(key, required, args, generator, default):
     if key in args:
         values = generator(key)
@@ -56,6 +61,7 @@ def create_app():
     from response import AutoJSONEncoder
     from search.search_engine import search_url
     from logging.handlers import RotatingFileHandler
+    from flask_compress import Compress
 
     # Get the config name
     config_name = os.environ.get('FLASK_CONFIG', 'development')
@@ -69,6 +75,12 @@ def create_app():
 
     # Set custom JSONEncoder
     app.json_encoder = AutoJSONEncoder
+
+    # Init response compression
+    # Compress(app)
+
+    # Remove jinja cache limit
+    # app.jinja_env.cache = {}
 
     # Setup logging
     file_handler = RotatingFileHandler(
@@ -90,7 +102,7 @@ def create_app():
     app.register_blueprint(search_blueprint, url_prefix="/search")
 
     # Search only?
-    search_only = bool(os.environ.get('SEARCH_ONLY', 'False'))
+    search_only = os.environ.get('SEARCH_ONLY', 'False') == "True"
     app.config["SEARCH_ONLY"] = search_only
 
     if app.config["SEARCH_ONLY"] is False:

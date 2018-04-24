@@ -38,6 +38,9 @@ class Suggestions(object):
         for item in self._suggestions:
             yield item
 
+    def __len__(self):
+        return len(self._suggestions)
+
     def __contains__(self, item):
         assert isinstance(
             item, Suggestion), "item must be an instance of 'Suggestion'"
@@ -84,11 +87,15 @@ class SuggestEngine(object):
         :param text:
         :return:
         """
-        from ..search import ons_search_engine, fields
+        from ..search import fields
+        from ..search.search_engine import get_client, get_index, SearchEngine
 
         tokens = text.split()
 
-        s = ons_search_engine()
+        client = get_client()
+        ons_index = get_index()
+        s = SearchEngine(using=client, index=ons_index)
+
         for i, token in enumerate(tokens):
             name = "suggest_%d" % i
             s = s.suggest(

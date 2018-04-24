@@ -1,21 +1,9 @@
-import os
-
 from flask import Blueprint, jsonify
 
-import fields
-from .search_engine import get_search_engine
 from hit import Hit
 
 # Create the search blueprint
 search = Blueprint("search", __name__)
-
-# Define some utility functions for search
-
-_INDEX = os.environ.get('SEARCH_INDEX', 'ons*')
-
-
-def ons_search_engine():
-    return get_search_engine(_INDEX)
 
 
 def aggs_to_json(aggregations, key):
@@ -119,7 +107,6 @@ def hits_to_json(
             "numberOfResults": content_response.hits.total,
             "took": content_response.took,
             "results": marshall_hits(content_response.hits),
-            "suggestions": [],
             "docCounts": {},
             "paginator": paginator,
             "sortBy": sort_by

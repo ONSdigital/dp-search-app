@@ -9,11 +9,23 @@ from sort_by import SortFields, query_sort
 from queries import content_query, type_counts_query
 from filter_functions import content_filter_functions
 from type_filter import all_filter_funcs
+
 search_url = os.environ.get('ELASTICSEARCH_URL', 'http://localhost:9200')
 
+_INDEX = os.environ.get('SEARCH_INDEX', 'ons*')
 
-def get_client(timeout=1000):
-    return Elasticsearch(search_url, timeout=timeout)
+
+def get_index():
+    return _INDEX
+
+
+def get_client(maxsize=25, timeout=1000):
+    """
+    :param maxsize: The maximum number of connections that urllib3 can open to each node
+    :param timeout:
+    :return:
+    """
+    return Elasticsearch(search_url, timeout=timeout, maxsize=maxsize)
 
 
 def get_search_engine(index, timeout=1000):
@@ -34,7 +46,6 @@ class SearchEngine(Search_api):
 
     def __init__(self, **kwargs):
         super(SearchEngine, self).__init__(**kwargs)
-        self.info = self._using.info()
 
     def highlight_fields(self):
         s = self._clone()
@@ -63,7 +74,7 @@ class SearchEngine(Search_api):
 
         if paginator is not None:
             from_start = 0 if paginator.current_page <= 1 else (
-                paginator.current_page - 1) * paginator.size
+                                                                       paginator.current_page - 1) * paginator.size
 
             query = {
                 "from": from_start,

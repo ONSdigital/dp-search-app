@@ -1,5 +1,3 @@
-from flask import current_app as app
-
 from ..suggest.supervised_models import SupervisedModel
 
 

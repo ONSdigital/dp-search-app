@@ -1,7 +1,8 @@
 from flask import render_template
 from flask import current_app as app
 
-from . import search, ons_search_engine, hits_to_json, aggs_to_json
+from . import search, hits_to_json, aggs_to_json
+from search_engine import get_client, get_index, SearchEngine
 from paginator import Paginator, MAX_VISIBLE_PAGINATOR_LINK
 from sort_by import SortFields
 
@@ -35,34 +36,61 @@ def execute_search(search_term, sort_by, **kwargs):
                     (user.id, user.user_id))
                 app.logger.exception(str(e))
 
-    # Perform the search
-    """
-    TODO - Replace below with MultiSearch
-    """
+    # Get the Elasticsearch client
+    client = get_client()
 
-    s = ons_search_engine().type_counts_query(search_term)
+    # Perform the search
+    ons_index = get_index()
+
+    # Init SearchEngine
+    s = SearchEngine(using=client, index=ons_index)
+
+    # Define type counts (aggregations) query
+    s = s.type_counts_query(search_term)
+
+    # Execute
     type_counts_response = s.execute()
 
+    # Format the output
     aggregations, total_hits = aggs_to_json(
         type_counts_response.aggregations, "docCounts")
 
+    # Setup paginator
     page_number = int(get_form_param("page", False, 1))
     page_size = int(get_form_param("size", False, 10))
 
-    paginator = Paginator(
-        total_hits,
-        MAX_VISIBLE_PAGINATOR_LINK,
-        page_number,
-        page_size)
+    paginator = None
 
-    # Perform the query
-    s = ons_search_engine().content_query(
+    if total_hits > 0:
+        paginator = Paginator(
+            total_hits,
+            MAX_VISIBLE_PAGINATOR_LINK,
+            page_number,
+            page_size)
+
+    # Perform the content query to populate the SERP
+
+    # Init SearchEngine
+    s = SearchEngine(using=client, index=ons_index)
+
+    # Define the query with sort and paginator
+    s = s.content_query(
         search_term, sort_by=sort_by, paginator=paginator, **kwargs)
+
+    # Execute the query
     content_response = s.execute()
 
+    # Check for featured results
     featured_result_response = None
-    if paginator.current_page <= 1:
-        s = ons_search_engine().featured_result_query(search_term)
+    # Only do this if we have results and are on the first page
+    if total_hits > 0 and paginator.current_page <= 1:
+        # Init the SearchEngine
+        s = SearchEngine(using=client, index=ons_index)
+
+        # Define the query
+        s = s.featured_result_query(search_term)
+
+        # Execute the query
         featured_result_response = s.execute()
 
     # Return the hits as JSON
