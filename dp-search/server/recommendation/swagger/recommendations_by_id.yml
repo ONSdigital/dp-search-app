@@ -7,7 +7,7 @@ parameters:
     type: string
     required: true
     description: Users _gaID
-  - name: count
+  - name: top_n
     in: query
     type: integer
     required: false

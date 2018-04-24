@@ -10,7 +10,7 @@ from ..suggest.supervised_models import load_supervised_model, SupervisedModels
 from flasgger import swag_from
 
 
-def get_user_recommendations(user_id):
+def get_user_recommendations(user_id, top_n):
     from ..users.user_utils import UserUtils
 
     if UserUtils.user_exists(user_id):
@@ -19,7 +19,6 @@ def get_user_recommendations(user_id):
         model = load_supervised_model(SupervisedModels.ONS)
         engine = RecommendationEngine(model)
 
-        top_n = int(get_request_param("count", False, default=10))
         recommendations = engine.recommend_labels_for_user(user, top_n)
 
         response = {"user_keywords": recommendations}
@@ -34,14 +33,16 @@ def current_user_recommendations():
     from ..users.user_utils import UserUtils
 
     user_id = UserUtils.get_current_user_id()
-    return get_user_recommendations(user_id)
+    top_n = int(get_request_param("top_n", False, default=10))
+    return get_user_recommendations(user_id, top_n)
 
 
 @swag_from("swagger/recommendations_by_id.yml")
 @recommendation.route("/user/id", methods=["POST"])
 def recommendations_by_id():
     user_id = get_form_param("user_id", True)
-    return get_user_recommendations(user_id)
+    top_n = int(get_request_param("top_n", False, default=10))
+    return get_user_recommendations(user_id, top_n)
 
 
 def update_session_by_sentiment(
@@ -92,4 +93,5 @@ def update_session():
         raise BadRequest("Unsupported sentiment: %s" % sentiment)
 
     # Return the new (updated) recommendations
-    return get_user_recommendations(user_id)
+    top_n = int(get_request_param("top_n", False, default=10))
+    return get_user_recommendations(user_id, top_n)

@@ -18,6 +18,12 @@ parameters:
     enum: ['positive', 'negative']
     required: true
     description: Positive or negaitve update
+  - name: top_n
+    in: query
+    type: integer
+    required: false
+    default: 10
+    description: Number of keywords to return (if available).
 responses:
   200:
     description: User exists.
