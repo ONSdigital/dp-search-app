@@ -8,6 +8,29 @@ db = app.db
 model = load_supervised_model(SupervisedModels.ONS)
 
 
+def default_distance_measure(original_vector, term_vector):
+    assert isinstance(
+        original_vector, np.ndarray), "original vector must be instance of np.ndarray"
+    assert isinstance(
+        term_vector, np.ndarray), "term vector must be instance of np.ndarray"
+
+    dist = term_vector - original_vector
+    return dist
+
+
+def default_move_session_vector(original_vector, term_vector):
+    """
+    Default method to modify a session vector to reflect interest in a term vector.
+    :param original_vector: Word vector representing the present session.
+    :param term_vector: Word vector representing the term of interest.
+    :return: An updated word vector which has moved towards the term vector in the full N-dimensional
+    vector space.
+    """
+    dist = default_distance_measure(original_vector, term_vector)
+
+    return original_vector + dist / 4
+
+
 class User(db.Document):
     """
     Class to represent a unique user of search, by their GA cookie IDs
@@ -64,7 +87,18 @@ class Session(db.Document):
     def session_array(self):
         return np.array(self.session_vector)
 
-    def update_session_vector(self, search_term):
+    def update_session_vector(
+            self,
+            search_term,
+            update_func=default_move_session_vector,
+            **kwargs):
+        """
+
+        :param search_term:
+        :param update_func: Callable - function which takes the original session vector, term vector
+        and (optional) kwargs and updates the session vector to reflect user interest.
+        :return:
+        """
         session_vec = self.session_array
         term_vector = model.get_sentence_vector(search_term)
 
@@ -73,7 +107,6 @@ class Session(db.Document):
             self.session_vector = term_vector.tolist()
         else:
             # Move the user vector towards the term vector
-            dist = term_vector - session_vec
-            session_vec += dist / 4.
-            self.session_vector = session_vec.tolist()
+            new_session_vec = update_func(session_vec, term_vector, **kwargs)
+            self.session_vector = new_session_vec.tolist()
         self.save()

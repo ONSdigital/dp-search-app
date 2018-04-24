@@ -74,7 +74,7 @@ class SearchEngine(Search_api):
 
         if paginator is not None:
             from_start = 0 if paginator.current_page <= 1 else (
-                                                                       paginator.current_page - 1) * paginator.size
+                paginator.current_page - 1) * paginator.size
 
             query = {
                 "from": from_start,

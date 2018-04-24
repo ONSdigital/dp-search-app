@@ -8,7 +8,12 @@ from flask import request, redirect, jsonify
 from exceptions.requests import BadRequest
 
 
-COMPRESS_MIMETYPES = ['text/html', 'text/css', 'text/xml', 'application/json', 'application/javascript']
+COMPRESS_MIMETYPES = [
+    'text/html',
+    'text/css',
+    'text/xml',
+    'application/json',
+    'application/javascript']
 COMPRESS_LEVEL = 6
 COMPRESS_MIN_SIZE = 500
 
@@ -65,6 +70,7 @@ def create_app():
 
     # Get the config name
     config_name = os.environ.get('FLASK_CONFIG', 'development')
+    compress_response = os.environ.get('FLASK_COMPRESSION', 'False') == "True"
 
     # Initialise the app from the config
     app = Flask(
@@ -77,7 +83,8 @@ def create_app():
     app.json_encoder = AutoJSONEncoder
 
     # Init response compression
-    # Compress(app)
+    if compress_response:
+        Compress(app)
 
     # Remove jinja cache limit
     # app.jinja_env.cache = {}

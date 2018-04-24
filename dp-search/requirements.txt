@@ -1,5 +1,6 @@
 Flask==0.12
 Flask-Script==2.0.3
+flask-compress==1.4.0
 itsdangerous==0.24
 Jinja2==2.9.5
 Werkzeug==0.12.1

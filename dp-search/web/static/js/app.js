@@ -62,8 +62,8 @@ $(document).ready(function() {
             type: "POST",
             success: function(data) {
                 $("ul#search-results").empty()
-                $.each(data.hits, function(i, hit) {
-                    var li = '<li><a href="#">' + hit.description.title + ' - ' + hit.type + '</a></li>'
+                $.each(data.result.results, function(i, hit) {
+                    var li = '<li><a href="#">' + hit.description.title + ' - ' + hit._type + '</a></li>'
                     $("ul#search-results").append(li)
                 });
             }

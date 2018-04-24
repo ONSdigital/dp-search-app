@@ -15,27 +15,6 @@ def execute_search(search_term, sort_by, **kwargs):
     """
     Simple search API to query Elasticsearch
     """
-    # Update user, but don't let it impact search
-    if app.config["SEARCH_ONLY"] is False:
-        from ..users.user_utils import UserUtils, SessionUtils
-
-        try:
-            user = UserUtils.get_current_user()
-            if user is not None:
-                session = SessionUtils.get_current_session(user)
-                if session is not None:
-                    with app.app_context():
-                        app.logger.info(
-                            "Updating session vector: %s:%s" %
-                            (user.user_id, session.session_id))
-                    session.update_session_vector(search_term)
-        except Exception as e:
-            with app.app_context():
-                app.logger.error(
-                    "Unable to update user '%s:%s'" %
-                    (user.id, user.user_id))
-                app.logger.exception(str(e))
-
     # Get the Elasticsearch client
     client = get_client()
 
@@ -93,6 +72,27 @@ def execute_search(search_term, sort_by, **kwargs):
         # Execute the query
         featured_result_response = s.execute()
 
+        # Update user, but catch any exceptions to prevent errors with search
+        if app.config["SEARCH_ONLY"] is False:
+            from ..users.user_utils import UserUtils, SessionUtils
+
+            try:
+                user = UserUtils.get_current_user()
+                if user is not None:
+                    session = SessionUtils.get_current_session(user)
+                    if session is not None:
+                        with app.app_context():
+                            app.logger.info(
+                                "Updating session vector: %s:%s" %
+                                (user.user_id, session.session_id))
+                        session.update_session_vector(search_term)
+            except Exception as e:
+                with app.app_context():
+                    app.logger.error(
+                        "Unable to update user '%s:%s'" %
+                        (user.id, user.user_id))
+                    app.logger.exception(str(e))
+
     # Return the hits as JSON
     return hits_to_json(
         content_response,
@@ -113,9 +113,6 @@ def content_query():
     """
     API for executing a standard ONS query
     """
-    import time
-
-    start = time.time()
     # Get query term from request
     search_term = get_request_param("q", True)
 
@@ -131,7 +128,4 @@ def content_query():
         search_term,
         sort_by,
         type_filters=type_filters)
-    end = time.time()
-    with app.app_context():
-        app.logger.info("Search query took %1.2f ms" % (end - start))
     return response

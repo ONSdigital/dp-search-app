@@ -1,0 +1,25 @@
+tags:
+  - recommend
+description: Returns a list of ONS keywords that are recommended for the current user, if they allow GA cookies to be stored.
+parameters:
+  - name: user_id
+    in: formData
+    type: string
+    required: true
+    description: Users _gaID
+  - name: term
+    in: formData
+    type: string
+    required: true
+    description: Term to update session vector
+  - name: sentiment
+    in: formData
+    type: string
+    enum: ['positive', 'negative']
+    required: true
+    description: Positive or negaitve update
+responses:
+  200:
+    description: User exists.
+  400:
+    description: User does not exist, or unknown sentiment.
