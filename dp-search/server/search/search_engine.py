@@ -5,10 +5,11 @@ from elasticsearch_dsl import Search as Search_api
 from elasticsearch_dsl import MultiSearch as MultiSearch_api
 
 import fields
+from search_type import SearchType
+from type_filter import all_filter_funcs
 from sort_by import SortFields, query_sort
 from queries import content_query, type_counts_query
 from filter_functions import content_filter_functions
-from type_filter import all_filter_funcs
 
 search_url = os.environ.get('ELASTICSEARCH_URL', 'http://localhost:9200')
 
@@ -66,6 +67,8 @@ class SearchEngine(Search_api):
             paginator=None,
             do_aggregations=False,
             **kwargs):
+
+        # Clone the SearchEngine before we make changes to it
         s = self._clone()
 
         function_scores = kwargs.pop(
@@ -113,7 +116,7 @@ class SearchEngine(Search_api):
             )
 
         # DFS_QUERY_THEN_FETCH
-        s = s.params(search_type="dfs_query_then_fetch")
+        s = s.params(search_type=SearchType.DFS_QUERY_THEN_FETCH)
 
         return s
 

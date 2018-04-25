@@ -115,11 +115,10 @@ def create_app():
     if app.config["SEARCH_ONLY"] is False:
         app.logger.info("Initialising additional endpoints")
         from .suggest import suggest as suggest_blueprint
-        from .nlp import nlp as nlp_blueprint
+        # from .nlp import nlp as nlp_blueprint  # Move to external service
         from .recommendation import recommendation as recommendation_blueprint
 
         app.register_blueprint(suggest_blueprint, url_prefix="/suggest")
-        app.register_blueprint(nlp_blueprint, url_prefix="/nlp")
         app.register_blueprint(
             recommendation_blueprint,
             url_prefix="/recommend")
@@ -140,7 +139,7 @@ def create_app():
     app.logger.info("MongoDB initialised")
     if config_name == "development":
         # Init swagger API docs
-        swagger = Swagger(app)
+        Swagger(app)
         app.logger.info("Swagger API docs initialised")
 
     # Redirect from index to apidocs

@@ -34,18 +34,18 @@ def execute_search(search_term, sort_by, **kwargs):
     aggregations, total_hits = aggs_to_json(
         type_counts_response.aggregations, "docCounts")
 
-    # Setup paginator
+    # Setup initial paginator
     page_number = int(get_form_param("page", False, 1))
     page_size = int(get_form_param("size", False, 10))
 
     paginator = None
-
     if total_hits > 0:
         paginator = Paginator(
             total_hits,
             MAX_VISIBLE_PAGINATOR_LINK,
             page_number,
             page_size)
+        print paginator.__json__()
 
     # Perform the content query to populate the SERP
 
@@ -58,6 +58,13 @@ def execute_search(search_term, sort_by, **kwargs):
 
     # Execute the query
     content_response = s.execute()
+
+    # Update the paginator
+    paginator = Paginator(
+        content_response.hits.total,
+        MAX_VISIBLE_PAGINATOR_LINK,
+        page_number,
+        page_size)
 
     # Check for featured results
     featured_result_response = None

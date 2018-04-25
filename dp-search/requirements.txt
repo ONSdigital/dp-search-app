@@ -15,7 +15,6 @@ gensim==3.2.0
 numpy==1.14.0
 futures
 flask-mongoengine
-sner
 enum34
 logging
 
