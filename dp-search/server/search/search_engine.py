@@ -116,7 +116,7 @@ class SearchEngine(Search_api):
             )
 
         # DFS_QUERY_THEN_FETCH
-        s = s.params(search_type=SearchType.DFS_QUERY_THEN_FETCH)
+        s.search_type(SearchType.DFS_QUERY_THEN_FETCH)
 
         return s
 
@@ -148,7 +148,14 @@ class SearchEngine(Search_api):
         s = s.highlight_fields()
 
         # DFS_QUERY_THEN_FETCH
-        s = s.params(search_type="dfs_query_then_fetch")
+        s = s.search_type(SearchType.DFS_QUERY_THEN_FETCH)
+        return s
+
+    def search_type(self, search_type):
+        assert isinstance(search_type, SearchType), "Must supply instance of SearchType enum"
+        s = self._clone()
+        s = s.params(search_type=search_type)
+
         return s
 
 

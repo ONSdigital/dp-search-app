@@ -45,7 +45,6 @@ def execute_search(search_term, sort_by, **kwargs):
             MAX_VISIBLE_PAGINATOR_LINK,
             page_number,
             page_size)
-        print paginator.__json__()
 
     # Perform the content query to populate the SERP
 
