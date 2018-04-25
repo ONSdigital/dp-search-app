@@ -10,13 +10,16 @@ class WordVectorModels(enum.Enum):
     ONS_FT = "ons_ft.vec"
     GOOGLE_SLIM = "GoogleNews-vectors-negative300-SLIM.bin"
 
+    def __str__(self):
+        return self.value
+
 
 def init(app):
     from spell_checker import init as init_spelling_models
     # Get the model dir from the current app config
     model_dir = app.config["VECTOR_MODELS_DIR"]
     for model in WordVectorModels:
-        fname = "%s/%s" % (model_dir, model.value)
+        fname = "%s/%s" % (model_dir, model)
         _models[model] = gensim.models.KeyedVectors.load_word2vec_format(
             fname, binary=fname.endswith(".bin"))
 

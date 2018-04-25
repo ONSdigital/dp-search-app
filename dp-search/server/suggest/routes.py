@@ -18,7 +18,7 @@ def keywords():
     query = get_request_param("q", True)
 
     # Get predicted keywords
-    top_n = get_request_param("count", False, default=5)
+    top_n = get_request_param("top_n", False, default=5)
     if is_number(top_n):
         top_n = int(top_n)
     else:

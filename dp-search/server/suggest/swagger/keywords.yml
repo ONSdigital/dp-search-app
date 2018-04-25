@@ -8,12 +8,12 @@ parameters:
     required: true
     default: rpi
     description: Query string to be evaluated.
-  - name: count
+  - name: top_n
     in: query
     type: integer
     required: false
     default: 5
-    description: Number of keywords to return (if available).
+    description: Top N keywords (if available).
 responses:
   200:
     description: All tokens in vocabulary.

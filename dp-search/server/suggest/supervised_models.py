@@ -9,6 +9,9 @@ _models = {}
 class SupervisedModels(enum.Enum):
     ONS = "ons_supervised.bin"
 
+    def __str__(self):
+        return self.value
+
 
 """
 TODO - Label clustering to reduce memory footprint
@@ -92,7 +95,7 @@ class SupervisedModel(object):
     """
     # def get_words_for_vector(self, vector, top_n=1):
     #     """
-    #     Returns the word nearest to the given vector
+    #     Returns the word(s) nearest to the given vector
     #     :param vector:
     #     :return:
     #     """
@@ -104,8 +107,9 @@ class SupervisedModel(object):
 
     def get_labels_for_vector(self, vector, top_n=1):
         """
-        Returns the label nearest to the given vector
+        Returns the label(s) nearest to the given vector
         :param vector:
+        :param top_n:
         :return:
         """
         cosine_similarity = cosine_sim_matrix(
@@ -155,7 +159,7 @@ def init(app):
     model_dir = app.config["SUPERVISED_VECTOR_MODELS_DIR"]
     label_prefix = app.config.get("SUPERVISED_VECTOR_LABEL", "__label__")
     for model in SupervisedModels:
-        fname = "%s/%s" % (model_dir, model.value)
+        fname = "%s/%s" % (model_dir, model)
         if os.path.isfile(fname):
             sm = fastText.load_model(fname)
             _models[model] = SupervisedModel(model, sm, prefix=label_prefix)
