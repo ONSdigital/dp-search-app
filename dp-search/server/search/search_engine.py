@@ -10,6 +10,7 @@ from type_filter import all_filter_funcs
 from sort_by import SortFields, query_sort
 from queries import content_query, type_counts_query
 from filter_functions import content_filter_functions
+from content_types import home_page_census, product_page
 
 search_url = os.environ.get('ELASTICSEARCH_URL', 'http://localhost:9200')
 
@@ -36,10 +37,6 @@ def get_search_engine(index, timeout=1000):
 """
 TODO - Implement MultiSearch:
 http://elasticsearch-dsl.readthedocs.io/en/latest/search_dsl.html?highlight=multisearch#multisearch
-
-TODO - Investigate ordered of results for query 'crime'
-    - Queries in kibana returns same order, so must be something in babbage
-    - related to latest releases?
 """
 
 
@@ -143,7 +140,7 @@ class SearchEngine(Search_api):
         s.update_from_dict(query)
 
         # Add filters
-        s = s.filter("terms", type=["product_page", "home_page_census"])
+        s = s.filter("terms", type=[product_page.name, home_page_census.name])
         # Add highlights
         s = s.highlight_fields()
 
@@ -152,7 +149,8 @@ class SearchEngine(Search_api):
         return s
 
     def search_type(self, search_type):
-        assert isinstance(search_type, SearchType), "Must supply instance of SearchType enum"
+        assert isinstance(
+            search_type, SearchType), "Must supply instance of SearchType enum"
         s = self._clone()
         s = s.params(search_type=search_type)
 

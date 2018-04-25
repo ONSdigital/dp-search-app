@@ -10,7 +10,7 @@ class ContentType(object):
 
 
 # Content types
-home_page = ContentType("hone_page")
+home_page = ContentType("home_page")
 home_page_census = ContentType("home_page_census")
 taxonomy_landing_page = ContentType("taxonomy_landing_page")
 product_page = ContentType("product_page")
