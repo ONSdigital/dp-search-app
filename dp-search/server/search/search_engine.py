@@ -2,7 +2,6 @@ import os
 
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search as Search_api
-from elasticsearch_dsl import MultiSearch as MultiSearch_api
 
 import fields
 from search_type import SearchType
@@ -46,6 +45,10 @@ class SearchEngine(Search_api):
         super(SearchEngine, self).__init__(**kwargs)
 
     def highlight_fields(self):
+        """
+        Appends highligher options onto Elasticsearch query
+        :return:
+        """
         s = self._clone()
 
         field_names = [field.name for field in fields.highlight_fields]
@@ -60,6 +63,13 @@ class SearchEngine(Search_api):
 
     @staticmethod
     def build_content_query(search_term, paginator=None, **kwargs):
+        """
+        Builds the default ONS content query (from babbage)
+        :param search_term:
+        :param paginator:
+        :param kwargs:
+        :return:
+        """
         function_scores = kwargs.pop(
             "function_scores", content_filter_functions())
 
@@ -81,6 +91,13 @@ class SearchEngine(Search_api):
         return query
 
     def _execute_query(self, query, **kwargs):
+        """
+        Internal function to execute a generic query and process
+        additional arguments, such as sort_by and type_filters
+        :param query:
+        :param kwargs:
+        :return:
+        """
         # Clone the SearchEngine before we make changes to it
         s = self._clone()
 
@@ -120,36 +137,66 @@ class SearchEngine(Search_api):
             search_term,
             paginator=None,
             **kwargs):
+        """
+        Builds and executes the standard ONS content query (from babbage)
+        :param search_term:
+        :param paginator:
+        :param kwargs:
+        :return:
+        """
+
+        # Build the standard content query
         query = SearchEngine.build_content_query(
             search_term, paginator=paginator, **kwargs)
+
+        # Execute
         return self._execute_query(query, **kwargs)
 
     def type_counts_query(self, search_term):
         """
-
+        Builds and executes the standard ONS types count query (from babbage)
         :param search_term:
         :return:
         """
+        # Use all relevant doc_types
         type_filters = all_filter_funcs()
+
+        # Build the standard content query
         query = SearchEngine.build_content_query(search_term)
+
+        # Add aggregations
         query["aggs"] = type_counts_query()
 
+        # Execute
         return self._execute_query(
             query,
             type_filters=type_filters)
 
     def featured_result_query(self, search_term):
+        """
+        Builds and executes the standard ONS featured result query (from babbage)
+        :param search_term:
+        :return:
+        """
+        # Build the default content query without filter functions
         dis_max = content_query(search_term)
         query = {
             "size": 1,
             "query": dis_max.to_dict()
         }
 
+        # Add doc_type filters
         type_filters = [product_page.name, home_page_census.name]
 
+        # Execute the query
         return self._execute_query(query, type_filters=type_filters)
 
     def search_type(self, search_type):
+        """
+        Adds search_type param to Elasticsearch query
+        :param search_type:
+        :return:
+        """
         assert isinstance(
             search_type, SearchType), "Must supply instance of SearchType enum"
         s = self._clone()
