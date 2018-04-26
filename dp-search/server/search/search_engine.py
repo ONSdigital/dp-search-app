@@ -58,19 +58,10 @@ class SearchEngine(Search_api):
 
         return s
 
-    def content_query(
-            self,
-            search_term,
-            paginator=None,
-            do_aggregations=False,
-            **kwargs):
-
-        # Clone the SearchEngine before we make changes to it
-        s = self._clone()
-
+    @staticmethod
+    def build_content_query(search_term, paginator=None, **kwargs):
         function_scores = kwargs.pop(
             "function_scores", content_filter_functions())
-        type_filters = kwargs.pop("type_filters", None)
 
         if paginator is not None:
             from_start = 0 if paginator.current_page <= 1 else (
@@ -82,15 +73,20 @@ class SearchEngine(Search_api):
                 "query": content_query(
                     search_term,
                     function_scores=function_scores).to_dict()}
-            if do_aggregations:
-                query["aggs"] = type_counts_query()
         else:
             query = {
                 "query": content_query(
                     search_term,
                     function_scores=function_scores).to_dict()}
-            if do_aggregations:
-                query["aggs"] = type_counts_query()
+        return query
+
+    def _execute_query(self, query, **kwargs):
+
+        # Clone the SearchEngine before we make changes to it
+        s = self._clone()
+
+        # Add type filters?
+        type_filters = kwargs.get("type_filters", None)
 
         # Update query from dict
         s.update_from_dict(query)
@@ -103,8 +99,8 @@ class SearchEngine(Search_api):
         # Highlight
         s = s.highlight_fields()
 
+        # Sort
         if "sort_by" in kwargs:
-            # Sort
             sort_by = kwargs.pop("sort_by")
             assert isinstance(
                 sort_by, SortFields), "sort_by must be instance of SortFields"
@@ -113,9 +109,21 @@ class SearchEngine(Search_api):
             )
 
         # DFS_QUERY_THEN_FETCH
-        s.search_type(SearchType.DFS_QUERY_THEN_FETCH)
+        search_type = kwargs.get(
+            "search_type",
+            SearchType.DFS_QUERY_THEN_FETCH)
+        s.search_type(search_type)
 
         return s
+
+    def content_query(
+            self,
+            search_term,
+            paginator=None,
+            **kwargs):
+        query = SearchEngine.build_content_query(
+            search_term, paginator=paginator, **kwargs)
+        return self._execute_query(query, **kwargs)
 
     def type_counts_query(self, search_term):
         """
@@ -124,9 +132,11 @@ class SearchEngine(Search_api):
         :return:
         """
         type_filters = all_filter_funcs()
-        return self.content_query(
-            search_term,
-            do_aggregations=True,
+        query = SearchEngine.build_content_query(search_term)
+        query["aggs"] = type_counts_query()
+
+        return self._execute_query(
+            query,
             type_filters=type_filters)
 
     def featured_result_query(self, search_term):

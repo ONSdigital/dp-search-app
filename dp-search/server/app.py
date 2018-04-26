@@ -70,7 +70,7 @@ def create_app():
 
     # Get the config name
     config_name = os.environ.get('FLASK_CONFIG', 'development')
-    compress_response = os.environ.get('FLASK_COMPRESSION', 'False') == "True"
+    compress_response = os.environ.get('FLASK_COMPRESSION', 'True') == "True"
 
     # Initialise the app from the config
     app = Flask(
