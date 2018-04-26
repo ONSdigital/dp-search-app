@@ -1,4 +1,4 @@
-from ..suggest.supervised_models import SupervisedModel
+from ..word_embedding.supervised_models import SupervisedModel
 
 
 class RecommendationEngine(object):

@@ -64,14 +64,14 @@ _models = {}
 
 
 def init():
-    from word2vec_models import WordVectorModels, load_model
+    from ..word_embedding.word2vec_models import WordVectorModels, load_model
 
     for model in WordVectorModels:
         _models[model] = SpellChecker(load_model(model))
 
 
 def load_spelling_model(model):
-    from word2vec_models import WordVectorModels
+    from ..word_embedding.word2vec_models import WordVectorModels
 
     if not isinstance(model, WordVectorModels):
         raise ValueError("Must be instance of Models enum")

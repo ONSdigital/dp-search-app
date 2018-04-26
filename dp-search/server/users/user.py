@@ -1,4 +1,4 @@
-from ..suggest.supervised_models import load_supervised_model, SupervisedModels
+from ..word_embedding.supervised_models import load_supervised_model, SupervisedModels
 
 from flask import current_app as app
 import numpy as np
@@ -65,6 +65,8 @@ class User(db.Document):
             # Average
             user_vec = np.mean(vectors, axis=0)
 
+            if np.all(user_vec == 0.):
+                return None
             return user_vec
         return None
 
@@ -103,7 +105,7 @@ class Session(db.Document):
         term_vector = model.get_sentence_vector(search_term)
 
         # Update the user vector
-        if np.all(session_vec == 0):
+        if np.all(session_vec == 0.):
             self.session_vector = term_vector.tolist()
         else:
             # Move the user vector towards the term vector

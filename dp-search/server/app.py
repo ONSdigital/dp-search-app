@@ -124,7 +124,7 @@ def create_app():
             url_prefix="/recommend")
 
         # Init suggest models using app config
-        from suggest import word2vec_models, supervised_models
+        from word_embedding import word2vec_models, supervised_models
         word2vec_models.init(app)
         supervised_models.init(app)
 

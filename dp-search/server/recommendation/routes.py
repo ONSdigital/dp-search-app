@@ -5,7 +5,7 @@ from . import recommendation
 from recommendation_engine import RecommendationEngine
 
 from ..app import get_request_param, get_form_param, BadRequest
-from ..suggest.supervised_models import load_supervised_model, SupervisedModels
+from ..word_embedding.supervised_models import load_supervised_model, SupervisedModels
 
 from flasgger import swag_from
 

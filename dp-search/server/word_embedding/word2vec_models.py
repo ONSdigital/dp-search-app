@@ -15,7 +15,7 @@ class WordVectorModels(enum.Enum):
 
 
 def init(app):
-    from spell_checker import init as init_spelling_models
+    from ..suggest.spell_checker import init as init_spelling_models
     # Get the model dir from the current app config
     model_dir = app.config["VECTOR_MODELS_DIR"]
     for model in WordVectorModels:

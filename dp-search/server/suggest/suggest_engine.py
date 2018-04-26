@@ -1,6 +1,6 @@
 import collections
 
-from word2vec_models import WordVectorModels
+from ..word_embedding.word2vec_models import WordVectorModels
 
 
 class Suggestion(object):

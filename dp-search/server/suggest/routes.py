@@ -1,10 +1,11 @@
 from flasgger import swag_from
 from flask import jsonify
 
-from suggest_engine import SuggestEngine
-from supervised_models import load_supervised_model, SupervisedModels
-from . import suggest
 from ..app import get_request_param
+
+from . import suggest
+from suggest_engine import SuggestEngine
+from ..word_embedding.supervised_models import load_supervised_model, SupervisedModels
 
 
 @suggest.route("/keywords")

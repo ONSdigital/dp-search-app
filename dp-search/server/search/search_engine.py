@@ -155,8 +155,3 @@ class SearchEngine(Search_api):
         s = s.params(search_type=search_type)
 
         return s
-
-
-class MultiSearchEngine(MultiSearch_api):
-    def __init__(self, **kwargs):
-        super(MultiSearchEngine, self).__init__(**kwargs)
