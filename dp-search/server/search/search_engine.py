@@ -81,15 +81,14 @@ class SearchEngine(Search_api):
         return query
 
     def _execute_query(self, query, **kwargs):
-
         # Clone the SearchEngine before we make changes to it
         s = self._clone()
 
-        # Add type filters?
-        type_filters = kwargs.get("type_filters", None)
-
         # Update query from dict
         s.update_from_dict(query)
+
+        # Add type filters?
+        type_filters = kwargs.get("type_filters", None)
 
         if type_filters is not None:
             if hasattr(type_filters, "__iter__") is False:
@@ -140,23 +139,15 @@ class SearchEngine(Search_api):
             type_filters=type_filters)
 
     def featured_result_query(self, search_term):
-        s = self._clone()
         dis_max = content_query(search_term)
         query = {
             "size": 1,
             "query": dis_max.to_dict()
         }
-        # Update query from dict
-        s.update_from_dict(query)
 
-        # Add filters
-        s = s.filter("terms", type=[product_page.name, home_page_census.name])
-        # Add highlights
-        s = s.highlight_fields()
+        type_filters = [product_page.name, home_page_census.name]
 
-        # DFS_QUERY_THEN_FETCH
-        s = s.search_type(SearchType.DFS_QUERY_THEN_FETCH)
-        return s
+        return self._execute_query(query, type_filters=type_filters)
 
     def search_type(self, search_type):
         assert isinstance(
