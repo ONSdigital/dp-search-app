@@ -112,7 +112,7 @@ class SearchEngine(Search_api):
         search_type = kwargs.get(
             "search_type",
             SearchType.DFS_QUERY_THEN_FETCH)
-        s.search_type(search_type)
+        s = s.search_type(search_type)
 
         return s
 
