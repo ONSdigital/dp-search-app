@@ -5,6 +5,8 @@ from time import strftime
 from flask import Flask
 from flask import request, redirect, jsonify
 
+from requests.requests import Request
+
 from exceptions.requests import BadRequest
 
 
@@ -16,6 +18,10 @@ COMPRESS_MIMETYPES = [
     'application/javascript']
 COMPRESS_LEVEL = 6
 COMPRESS_MIN_SIZE = 500
+
+
+class CustomFlask(Flask):
+    request_class = Request
 
 
 def _get_param(key, required, args, generator, default):
@@ -73,7 +79,11 @@ def create_app():
     compress_response = os.environ.get('FLASK_COMPRESSION', 'True') == "True"
 
     # Initialise the app from the config
-    app = Flask(
+    # app = Flask(
+    #     __name__,
+    #     template_folder="../web/templates",
+    #     static_folder="../web/static")
+    app = CustomFlask(
         __name__,
         template_folder="../web/templates",
         static_folder="../web/static")

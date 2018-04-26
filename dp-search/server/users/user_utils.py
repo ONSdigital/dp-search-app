@@ -24,6 +24,7 @@ class UserUtils():
     @staticmethod
     def get_current_user_id():
         from flask import request
+        print 'get_current_user_id:', type(request.cookies)
         if "_ga" in request.cookies:
             user_id = request.cookies.get("_ga")
             return user_id

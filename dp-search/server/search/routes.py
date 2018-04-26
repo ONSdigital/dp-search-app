@@ -94,9 +94,12 @@ def execute_search(search_term, sort_by, **kwargs):
                         session.update_session_vector(search_term)
             except Exception as e:
                 with app.app_context():
+                    from flask import request
+                    user_id = UserUtils.get_current_user_id()
+                    session_id = SessionUtils.get_current_session_id()
                     app.logger.error(
                         "Unable to update user '%s:%s'" %
-                        (user.id, user.user_id))
+                        (user_id, session_id))
                     app.logger.exception(str(e))
 
     # Return the hits as JSON
