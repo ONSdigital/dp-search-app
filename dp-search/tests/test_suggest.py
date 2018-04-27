@@ -59,7 +59,7 @@ class SuggestTestCase(BaseTest):
     def test_keywords_data_count(self):
         count = 10
         request = "/suggest/keywords?q=" + \
-                  urllib.quote_plus(self.query) + "&count=%d" % count
+                  urllib.quote_plus(self.query) + "&top_n=%d" % count
         response = self.client.get(request)
         data = response.data
 

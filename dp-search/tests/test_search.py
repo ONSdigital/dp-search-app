@@ -20,8 +20,6 @@ class SearchTestCase(BaseTest):
         request = "/search/ons?q=" + urllib.quote_plus(self.query)
 
         params = {}
-        if do_must_must_not:
-            params = {"must": self.query, "must_not": self.must_not}
 
         response = self.client.post(request, data=params)
         return response
@@ -35,21 +33,6 @@ class SearchTestCase(BaseTest):
 
         self.assertFalse(response is None)
         self.assertEquals(response.status_code, 200)
-
-    @staticmethod
-    def extract_doc_counts(data):
-        """
-        Extracts total document counts from response aggregation
-        :param data:
-        :return:
-        """
-        aggs = data["aggs"]
-        buckets = aggs["docCounts"]["buckets"]
-
-        total_counts = 0
-        for bucket in buckets:
-            total_counts = total_counts + int(bucket["doc_count"])
-        return total_counts
 
     def test_search_response(self):
         """
@@ -67,30 +50,15 @@ class SearchTestCase(BaseTest):
         self.assertFalse(json_data is None)
         self.assertTrue(isinstance(json_data, dict))
 
-        self.assertTrue("hits" in json_data)
-        self.assertTrue("aggs" in json_data)
+        self.assertTrue("result" in json_data)
+        self.assertTrue("counts" in json_data)
+        self.assertTrue("docCounts" in json_data["counts"])
+        self.assertTrue("featuredResult" in json_data)
 
-        self.assertTrue(len(json_data["hits"]) > 0)
-        self.assertTrue(len(json_data["aggs"]) > 0)
+        hits = json_data["result"]["results"]
+        aggs = json_data["counts"]
+        featured = json_data["featuredResult"]
 
-    def test_search_must_must_not(self):
-        """
-        Tests that including a must_not clause leads to less results than a standard query
-        :return:
-        """
-        must_must_not_response = self._get_response(do_must_must_not=True)
-        base_response = self._get_response(do_must_must_not=False)
-
-        must_must_not_data = must_must_not_response.data
-        json_must_must_not_data = json.loads(must_must_not_data)
-
-        base_data = base_response.data
-        json_base_data = json.loads(base_data)
-
-        must_must_not_counts = self.extract_doc_counts(json_must_must_not_data)
-        base_counts = self.extract_doc_counts(json_base_data)
-
-        self.assertTrue(must_must_not_counts > 0)
-        self.assertTrue(base_counts > 0)
-
-        self.assertTrue(base_counts > must_must_not_counts)
+        self.assertTrue(len(hits) > 0)
+        self.assertTrue(aggs["numberOfResults"] > 0)
+        self.assertEqual(featured["numberOfResults"], 1)
