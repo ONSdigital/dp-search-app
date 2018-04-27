@@ -31,5 +31,6 @@ class ImmutableAnonymousIdDict(ImmutableTypeConversionDict):
 
 
 class Request(Request):
-    # Use a regular
+    # Replace the dict storage with the above ImmutableAnonymousIdDict to force hashing of
+    # GA IDs
     dict_storage_class = ImmutableAnonymousIdDict

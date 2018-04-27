@@ -79,10 +79,6 @@ def create_app():
     compress_response = os.environ.get('FLASK_COMPRESSION', 'True') == "True"
 
     # Initialise the app from the config
-    # app = Flask(
-    #     __name__,
-    #     template_folder="../web/templates",
-    #     static_folder="../web/static")
     app = CustomFlask(
         __name__,
         template_folder="../web/templates",
@@ -91,6 +87,12 @@ def create_app():
 
     # Set custom JSONEncoder
     app.json_encoder = AutoJSONEncoder
+
+    # Enable CORS?
+    cors_enabled = os.environ.get('FLASK_CORS', 'False') == "True"
+    if cors_enabled:
+        from flask_cors import CORS
+        CORS(app)
 
     # Init response compression
     if compress_response:
