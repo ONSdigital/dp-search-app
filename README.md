@@ -20,6 +20,9 @@ To configure the application see the "config_*.py" configuration files. Possible
 | ELASTICSEARCH_URL    | http://localhost:9200   | URL of Elasticsearch cluster.
 | SEARCH_INDEX         | ons*                    | The Elasticsearch index to be queried.
 | MONGO_DB             | local                   | Default db to use in mongoDB.
+| FLASK_COMPRESSION    | True                    | Compress responses (True/False)
+| FLASK_CORS           | False                   | Enable Cross Origin Resource Sharing (CORS) by default (True/False)
+| SEARCH_ONLY          | False                   | Enable search API only (True/False)
 
 There are two options for running the server:
 Use ```python manage.py runserver``` to run as a WSGIServer (simple), or  ```./run_gunicorn.sh``` to initialise as a 
