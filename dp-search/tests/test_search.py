@@ -12,7 +12,7 @@ class SearchTestCase(BaseTest):
         self.query = "rpi"
         self.must_not = "cpi"
 
-    def _get_response(self, do_must_must_not=True):
+    def _get_response(self):
         """
         Executes the test query and returns the response
         :return:
