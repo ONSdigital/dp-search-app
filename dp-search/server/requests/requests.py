@@ -1,44 +1,35 @@
+import types
 import hashlib
 from flask import Request
+from werkzeug.datastructures import ImmutableTypeConversionDict
 
 
-class HashDict(dict):
+class ImmutableAnonymousIdDict(ImmutableTypeConversionDict):
+    """
+    An immutable dict to store request params which ensures that GA IDs are always
+    one-way hashed BEFORE being stored.
+    """
 
     hash_fields = ["_ga", "_gid"]
 
     def __init__(self, *args, **kwargs):
-        self.update(*args, **kwargs)
-
-    def __setitem__(self, key, value):
-        # optional processing here
-        super(HashDict, self).__setitem__(key, value)
-
-    def update(self, *args, **kwargs):
         if args:
-            if len(args) > 1:
-                raise TypeError("update expected at most 1 arguments, "
-                                "got %d" % len(args))
-            other = dict(args[0])
-            for key in other:
-                if key in self.hash_fields:
-                    self[key] = str(hashlib.sha512(other[key]).hexdigest())
-                else:
-                    self[key] = other[key]
+            if isinstance(args, tuple):
+                for arg in args:
+                    if isinstance(arg, types.GeneratorType):
+                        for key, value in arg:
+                            kwargs[key] = value
         for key in kwargs:
             if key in self.hash_fields:
-                self[key] = str(hashlib.sha512(kwargs[key]).hexdigest())
-            else:
-                self[key] = kwargs[key]
+                kwargs[key] = ImmutableAnonymousIdDict.hash_value(kwargs[key])
 
-    def setdefault(self, key, value=None):
-        if key not in self:
-            if key in self.hash_fields:
-                self[key] = str(hashlib.sha512(value).hexdigest())
-            else:
-                self[key] = value
-        return self[key]
+        super(ImmutableAnonymousIdDict, self).__init__(**kwargs)
+
+    @staticmethod
+    def hash_value(value):
+        return str(hashlib.sha512(value).hexdigest())
 
 
 class Request(Request):
     # Use a regular
-    dict_storage_class = HashDict
+    dict_storage_class = ImmutableAnonymousIdDict
