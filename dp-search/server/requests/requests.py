@@ -27,7 +27,10 @@ class ImmutableAnonymousIdDict(ImmutableTypeConversionDict):
 
     @staticmethod
     def hash_value(value):
-        return str(hashlib.sha512(value).hexdigest())
+        from ..users import get_salt
+
+        salt = get_salt()
+        return str(hashlib.sha512(value + salt).hexdigest())
 
 
 class Request(Request):

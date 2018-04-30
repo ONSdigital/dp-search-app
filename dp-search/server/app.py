@@ -74,6 +74,8 @@ def create_app():
     from logging.handlers import RotatingFileHandler
     from flask_compress import Compress
 
+    assert os.path.isfile("./secrets.json"), "Unable to locate decrypted secrets file"
+
     # Get the config name
     config_name = os.environ.get('FLASK_CONFIG', 'development')
     compress_response = os.environ.get('FLASK_COMPRESSION', 'True') == "True"
