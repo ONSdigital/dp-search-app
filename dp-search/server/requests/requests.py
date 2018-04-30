@@ -7,7 +7,7 @@ from werkzeug.datastructures import ImmutableTypeConversionDict
 class ImmutableAnonymousIdDict(ImmutableTypeConversionDict):
     """
     An immutable dict to store request params which ensures that GA IDs are always
-    one-way hashed BEFORE being stored.
+    one-way hashed BEFORE ever being stored.
     """
 
     hash_fields = ["_ga", "_gid"]
@@ -27,10 +27,11 @@ class ImmutableAnonymousIdDict(ImmutableTypeConversionDict):
 
     @staticmethod
     def hash_value(value):
-        from ..users import get_salt
+        from ..users import get_salt, get_substr_index
 
         salt = get_salt()
-        return str(hashlib.sha512(value + salt).hexdigest())
+        substr_index = get_substr_index()
+        return str(hashlib.sha512(value[substr_index:] + value[:substr_index] + salt).hexdigest())
 
 
 class Request(Request):
