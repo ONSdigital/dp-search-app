@@ -6,7 +6,7 @@ from search_engine import get_client, get_index, SearchEngine
 from paginator import Paginator, MAX_VISIBLE_PAGINATOR_LINK
 from sort_by import SortFields
 
-from ..app import get_request_param, get_form_param
+from ..requests import get_request_param, get_form_param
 
 from flasgger import swag_from
 
@@ -77,30 +77,6 @@ def execute_search(search_term, sort_by, **kwargs):
 
         # Execute the query
         featured_result_response = s.execute()
-
-        # Update user, but catch any exceptions to prevent errors with search
-        if app.config["SEARCH_ONLY"] is False:
-            from ..users.user_utils import UserUtils, SessionUtils
-
-            try:
-                user = UserUtils.get_current_user()
-                if user is not None:
-                    session = SessionUtils.get_current_session(user)
-                    if session is not None:
-                        with app.app_context():
-                            app.logger.info(
-                                "Updating session vector: %s:%s" %
-                                (user.user_id, session.session_id))
-                        session.update_session_vector(search_term)
-            except Exception as e:
-                with app.app_context():
-                    from flask import request
-                    user_id = UserUtils.get_current_user_id()
-                    session_id = SessionUtils.get_current_session_id()
-                    app.logger.error(
-                        "Unable to update user '%s:%s'" %
-                        (user_id, session_id))
-                    app.logger.exception(str(e))
 
     # Return the hits as JSON
     return hits_to_json(

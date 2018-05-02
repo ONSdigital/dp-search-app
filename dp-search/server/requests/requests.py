@@ -34,7 +34,7 @@ class ImmutableAnonymousIdDict(ImmutableTypeConversionDict):
         return str(hashlib.sha512(value[substr_index:] + value[:substr_index] + salt).hexdigest())
 
 
-class Request(Request):
+class CustomRequest(Request):
     # Replace the dict storage with the above ImmutableAnonymousIdDict to force hashing of
     # GA IDs
     dict_storage_class = ImmutableAnonymousIdDict

@@ -4,8 +4,9 @@ from flask import current_app as app
 from . import recommendation
 from recommendation_engine import RecommendationEngine
 
-from ..app import get_request_param, get_form_param, BadRequest
+from ..requests import get_request_param, get_form_param
 from ..word_embedding.supervised_models import load_supervised_model, SupervisedModels
+from ..exceptions.requests import BadRequest
 
 from flasgger import swag_from
 
@@ -27,24 +28,6 @@ def get_user_recommendations(user_id, top_n):
     raise BadRequest("User does not exist")
 
 
-@swag_from("swagger/current_user_recommendations.yml")
-@recommendation.route("/user")
-def current_user_recommendations():
-    from ..users.user_utils import UserUtils
-
-    user_id = UserUtils.get_current_user_id()
-    top_n = int(get_request_param("top_n", False, default=10))
-    return get_user_recommendations(user_id, top_n)
-
-
-@swag_from("swagger/recommendations_by_id.yml")
-@recommendation.route("/user/id", methods=["POST"])
-def recommendations_by_id():
-    user_id = get_form_param("user_id", True)
-    top_n = int(get_request_param("top_n", False, default=10))
-    return get_user_recommendations(user_id, top_n)
-
-
 def update_session_by_sentiment(
         original_vector,
         term_vector,
@@ -61,6 +44,16 @@ def update_session_by_sentiment(
         raise Exception("Unknown sentiment: %s" % sentiment)
 
 
+@swag_from("swagger/current_user_recommendations.yml")
+@recommendation.route("/user")
+def current_user_recommendations():
+    from ..users.user_utils import UserUtils
+
+    user_id = UserUtils.get_current_user_id()
+    top_n = int(get_request_param("top_n", False, default=10))
+    return get_user_recommendations(user_id, top_n)
+
+
 @swag_from("swagger/update_session.yml")
 @recommendation.route("/user/update", methods=["POST"])
 def update_session():
@@ -70,22 +63,23 @@ def update_session():
     """
     from ..users.user_utils import UserUtils, SessionUtils
 
-    user_id = get_form_param("user_id", True)
     term = get_form_param("term", True)
     sentiment = get_form_param("sentiment", True)
 
     possible_sentiments = ["positive", "negative"]
     if sentiment in possible_sentiments:
-        user = UserUtils.find_user(user_id)
-        if user is not None:
-            session = SessionUtils.get_current_session(user)
-            if session is not None:
-                with app.app_context():
-                    app.logger.info(
-                        "Updating session vector: %s:%s" %
-                        (user.user_id, session.session_id))
-                session.update_session_vector(
-                    term, update_func=update_session_by_sentiment, sentiment=sentiment)
+        user_id = UserUtils.get_current_user_id()
+        if user_id is not None:
+            user = UserUtils.find_user(user_id)
+            if user is not None:
+                session = SessionUtils.get_current_session(user)
+                if session is not None:
+                    with app.app_context():
+                        app.logger.info(
+                            "Updating session vector: %s:%s" %
+                            (user.user_id, session.session_id))
+                    session.update_session_vector(
+                        term, update_func=update_session_by_sentiment, sentiment=sentiment)
 
         else:
             raise BadRequest("Unknown user: %s" % user_id)

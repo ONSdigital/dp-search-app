@@ -1,7 +1,7 @@
 from flasgger import swag_from
 from flask import jsonify
 
-from ..app import get_request_param
+from ..requests import get_request_param
 
 from . import suggest
 from suggest_engine import SuggestEngine
